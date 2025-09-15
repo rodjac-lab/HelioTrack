@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Position Solaire 3D - Outil Pédagogique</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .visualization {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .data-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .control-group h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .slider-container {
+            margin: 15px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6b35;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6b35;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        #threejs-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 50%, #DEB887 100%);
+            position: relative;
+        }
+
+        .data-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #ff6b35;
+        }
+
+        .data-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .data-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .data-unit {
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6b35;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #e55a2b;
+        }
+
+        .info-box {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .animation-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .anim-btn {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .anim-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .anim-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .view-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover {
+            background: rgba(255, 107, 53, 0.9);
+            color: white;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1e5e9;
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .orbit-info {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .seasonal-legend {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 3px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .smoke-test {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 128, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            z-index: 1002;
+            display: none;
+        }
+
+        .smoke-test.error {
+            background: rgba(255, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌞 Calculateur de Position Solaire 3D</h1>
+            <p>Visualisation tridimensionnelle de l'impact solaire sur les bâtiments</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Panneau de contrôles -->
+            <div class="controls-panel">
+                <h2>🎛️ Paramètres</h2>
+                
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="setLocation(41.9028, 12.4964)">Rome</button>
+                    <button class="preset-btn" onclick="setLocation(45.7640, 4.8357)">Lyon</button>
+                    <button class="preset-btn" onclick="setLocation(52.3740, 4.8952)">Amsterdam</button>
+                    <button class="preset-btn" onclick="setLocation(59.9133, 10.7390)">Oslo</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>📅 Paramètres Temporels</h3>
+                    <label for="date-slider">Jour de l'année : <span id="current-date">21 Mar</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="date-slider" class="slider" min="1" max="365" value="80">
+                        <div class="slider-label">
+                            <span>1 Jan</span>
+                            <span>31 Déc</span>
+                        </div>
+                    </div>
+
+                    <label for="time-slider">Heure solaire : <span id="current-time">12:00</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="time-slider" class="slider" min="0" max="23.5" value="12" step="0.5">
+                        <div class="slider-label">
+                            <span>00:00</span>
+                            <span>23:30</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animation-controls">
+                    <button class="anim-btn" onclick="animateDay()">▶️ Journée</button>
+                    <button class="anim-btn" onclick="animateYear()">🗓️ Année</button>
+                    <button class="anim-btn" onclick="stopAnimation()">⏹️ Stop</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>📍 Géolocalisation</h3>
+                    <label for="latitude">Latitude (°)</label>
+                    <input type="number" id="latitude" value="48.8566" min="-90" max="90" step="0.0001">
+                    
+                    <label for="longitude">Longitude (°)</label>
+                    <input type="number" id="longitude" value="2.3522" min="-180" max="180" step="0.0001">
+                </div>
+
+                <div class="control-group">
+                    <h3>🏠 Orientation Bâtiment</h3>
+                    <label for="building-orientation">Azimut façade principale (°)</label>
+                    <input type="number" id="building-orientation" value="180" min="0" max="360" step="1">
+                    <small style="color: #666;">0°=Nord, 90°=Est, 180°=Sud, 270°=Ouest</small>
+                </div>
+
+                <div class="info-box">
+                    <h3>🎮 Contrôles 3D</h3>
+                    <p><strong>Souris :</strong> Rotation de la vue</p>
+                    <p><strong>Molette :</strong> Zoom avant/arrière</p>
+                    <p><strong>Clic droit :</strong> Déplacement latéral</p>
+                    <p><strong>Boutons :</strong> Vues prédéfinies</p>
+                </div>
+            </div>
+
+            <!-- Zone de visualisation 3D -->
+            <div class="visualization">
+                <h2>🏠 Scène 3D Interactive</h2>
+                
+                <div id="threejs-container">
+                    <div class="loading-overlay" id="loading-overlay">
+                        <div class="loading-spinner"></div>
+                        <div>Chargement de la scène 3D...</div>
+                    </div>
+                    
+                    <div class="smoke-test" id="smoke-test">Smoke Test: OK</div>
+                    
+                    <div class="view-controls">
+                        <button class="view-btn" onclick="setView('top')">🔍 Dessus</button>
+                        <button class="view-btn" onclick="setView('side')">👁️ Profil</button>
+                        <button class="view-btn" onclick="setView('iso')">🔍 Iso</button>
+                        <button class="view-btn" onclick="setView('free')">🎮 Libre</button>
+                    </div>
+
+                    <div class="seasonal-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff4444;"></div>
+                            <span>Solstice été (21 juin)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4444ff;"></div>
+                            <span>Solstice hiver (21 déc)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #44ff44;"></div>
+                            <span>Équinoxes (21 mar/sep)</span>
+                        </div>
+                    </div>
+
+                    <div class="orbit-info" id="orbit-info">
+                        Azimut: 180° | Élévation: 45° | Distance: 10m
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau de données -->
+            
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Variables globales Three.js
+        let scene, camera, renderer, controls;
+        let building, sun, ground, compassRose;
+        let seasonalPaths = [];
+        let sunLight, ambientLight;
+        let animationId = null;
+        let isAnimating = false;
+
+        // Constantes
+        const SOLAR_CONSTANT = 1361;
+        const DEGREES_TO_RADIANS = Math.PI / 180;
+        const RADIANS_TO_DEGREES = 180 / Math.PI;
+
+        // Configuration de la scène
+        const SCENE_SIZE = 20;
+        const SUN_DISTANCE = 15;
+
+        // Système de smoke test
+        function smokeTest(testName, testFunction) {
+            const indicator = document.getElementById('smoke-test');
+            try {
+                const result = testFunction();
+                if (result) {
+                    indicator.textContent = `✓ ${testName}: OK`;
+                    indicator.className = 'smoke-test';
+                    indicator.style.display = 'block';
+                    setTimeout(() => indicator.style.display = 'none', 2000);
+                    return true;
+                } else {
+                    throw new Error('Test failed');
+                }
+            } catch (error) {
+                indicator.textContent = `✗ ${testName}: ERREUR`;
+                indicator.className = 'smoke-test error';
+                indicator.style.display = 'block';
+                console.error(`Smoke test ${testName} failed:`, error);
+                return false;
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initThreeJS();
+            attachEventListeners();
+            updateDisplay();
+        });
+
+        // Initialisation de Three.js
+        function initThreeJS() {
+            const container = document.getElementById('threejs-container');
+            
+            // Test de base
+            if (!smokeTest('Initialisation conteneur', () => container !== null)) {
+                return;
+            }
+            
+            // Scène
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+
+            // Caméra
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(15, 15, 15);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Test Three.js
+            smokeTest('Three.js Setup', () => scene && camera && renderer);
+
+            // Contrôles orbitaux
+            setupOrbitControls();
+
+            // Éclairage
+            setupLighting();
+
+            // Sol beige clair
+            createGround();
+            smokeTest('Sol beige', () => ground && ground.material.color.getHex() === 0xF5DEB3);
+
+            // Rosace des vents (après le sol)
+            createCompassRose();
+            smokeTest('Rosace créée', () => compassRose && compassRose.material && compassRose.material.map);
+
+            // Bâtiment agrandi et coloré
+            createBuilding();
+            smokeTest('Bâtiment modifié', () => {
+                const buildingMesh = building.children.find(child => child.geometry && child.geometry.type === 'BoxGeometry');
+                const roof = building.children.find(child => child.geometry && child.geometry.type === 'ConeGeometry');
+                return buildingMesh && roof && 
+                       buildingMesh.material.color.getHex() === 0x808080 && // Gris
+                       roof.material.color.getHex() === 0xB22222; // Rouge brique
+            });
+
+            // Soleil
+            createSun();
+
+            // Trajectoires saisonnières
+            createSeasonalPaths();
+
+            // Gestion du redimensionnement
+            window.addEventListener('resize', onWindowResize);
+
+            // Masquer l'overlay de chargement
+            document.getElementById('loading-overlay').style.display = 'none';
+
+            // Test final
+            smokeTest('Scène complète', () => scene.children.length > 0);
+
+            // Démarrer le rendu
+            animate();
+        }
+
+        // Création de la rosace des vents avec Canvas + Texture
+        function createCompassRose() {
+            // Créer un canvas pour dessiner la rosace
+            const canvas = document.createElement('canvas');
+            const size = 512; // Résolution du canvas
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Fond transparent
+            ctx.clearRect(0, 0, size, size);
+
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = size / 2 - 20;
+
+            // Style général
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#2F4F4F';
+            ctx.fillStyle = '#2F4F4F';
+
+            // Dessiner les rayons tous les 22.5°
+            for (let i = 0; i < 16; i++) {
+                const angle = (i * 22.5) * DEGREES_TO_RADIANS;
+                const isMainDirection = (i % 4 === 0); // N, E, S, O
+                const isSecondaryDirection = (i % 2 === 0); // NE, SE, SO, NO
+                
+                let rayLength;
+                if (isMainDirection) {
+                    rayLength = radius; // Rayons principaux
+                    ctx.lineWidth = 3;
+                } else if (isSecondaryDirection) {
+                    rayLength = radius * 0.7; // Rayons secondaires
+                    ctx.lineWidth = 2;
+                } else {
+                    rayLength = radius * 0.4; // Rayons tertiaires
+                    ctx.lineWidth = 1;
+                }
+
+                const startX = centerX + Math.sin(angle) * 30;
+                const startY = centerY - Math.cos(angle) * 30;
+                const endX = centerX + Math.sin(angle) * rayLength;
+                const endY = centerY - Math.cos(angle) * rayLength;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                // Flèches pour les directions principales
+                if (isMainDirection) {
+                    const arrowSize = 15;
+                    const arrowX = centerX + Math.sin(angle) * (rayLength - arrowSize);
+                    const arrowY = centerY - Math.cos(angle) * (rayLength - arrowSize);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(arrowX + Math.sin(angle - 0.3) * arrowSize, arrowY - Math.cos(angle - 0.3) * arrowSize);
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(arrowX + Math.sin(angle + 0.3) * arrowSize, arrowY - Math.cos(angle + 0.3) * arrowSize);
+                    ctx.stroke();
+                }
+            }
+
+            // Cercles concentriques
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#696969';
+            for (let r of [radius * 0.3, radius * 0.6, radius * 0.9]) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, r, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            // Cercle central
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = '#8B4513';
+            ctx.fill();
+            ctx.strokeStyle = '#2F4F4F';
+            ctx.stroke();
+
+            // Labels des directions principales - N plus visible au bout de la branche
+            const directions = [
+                { label: 'N', angle: 0 },
+                { label: 'E', angle: 90 },
+                { label: 'S', angle: 180 },
+                { label: 'O', angle: 270 }
+            ];
+
+            ctx.font = 'bold 32px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            directions.forEach(dir => {
+                const angle = dir.angle * DEGREES_TO_RADIANS;
+                let labelDistance = radius + 35;
+                
+                // Pour le N, on le place encore plus loin au bout de la branche
+                if (dir.label === 'N') {
+                    labelDistance = radius + 50;
+                    ctx.font = 'bold 40px Arial'; // Plus gros pour le N
+                    ctx.fillStyle = '#FF0000'; // Rouge pour être plus visible
+                }
+                
+                const labelX = centerX + Math.sin(angle) * labelDistance;
+                const labelY = centerY - Math.cos(angle) * labelDistance;
+                ctx.fillText(dir.label, labelX, labelY);
+                
+                // Remettre les paramètres par défaut pour les autres lettres
+                if (dir.label === 'N') {
+                    ctx.font = 'bold 32px Arial';
+                    ctx.fillStyle = '#000000';
+                }
+            });
+
+            // Créer la texture Three.js
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+
+            // Créer le mesh de la rosace
+            const geometry = new THREE.PlaneGeometry(20, 20); // 20m de diamètre
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            compassRose = new THREE.Mesh(geometry, material);
+            compassRose.rotation.x = -Math.PI / 2; // Horizontal
+            compassRose.position.y = 0.01; // Éviter z-fighting
+            compassRose.userData.isCompassRose = true;
+
+            scene.add(compassRose);
+        }
+
+        // Contrôles orbitaux simplifiés
+        function setupOrbitControls() {
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            let spherical = new THREE.Spherical();
+            spherical.setFromVector3(camera.position);
+
+            const canvas = renderer.domElement;
+
+            canvas.addEventListener('mousedown', (event) => {
+                isDragging = true;
+                previousMousePosition = { x: event.clientX, y: event.clientY };
+            });
+
+            canvas.addEventListener('mousemove', (event) => {
+                if (!isDragging) return;
+
+                const deltaX = event.clientX - previousMousePosition.x;
+                const deltaY = event.clientY - previousMousePosition.y;
+
+                spherical.theta -= deltaX * 0.01;
+                spherical.phi += deltaY * 0.01;
+                spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+
+                camera.position.setFromSpherical(spherical);
+                camera.lookAt(0, 0, 0);
+
+                previousMousePosition = { x: event.clientX, y: event.clientY };
+                updateOrbitInfo();
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            canvas.addEventListener('wheel', (event) => {
+                event.preventDefault();
+                spherical.radius += event.deltaY * 0.01;
+                spherical.radius = Math.max(5, Math.min(50, spherical.radius));
+                camera.position.setFromSpherical(spherical);
+                camera.lookAt(0, 0, 0);
+                updateOrbitInfo();
+            });
+        }
+
+        // Configuration de l'éclairage
+        function setupLighting() {
+            // Lumière ambiante
+            ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+
+            // Lumière du soleil
+            sunLight = new THREE.DirectionalLight(0xffffff, 1);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 50;
+            sunLight.shadow.camera.left = -20;
+            sunLight.shadow.camera.right = 20;
+            sunLight.shadow.camera.top = 20;
+            sunLight.shadow.camera.bottom = -20;
+            scene.add(sunLight);
+            scene.add(sunLight.target);
+        }
+
+        // Sol beige clair
+        function createGround() {
+            const groundGeometry = new THREE.PlaneGeometry(SCENE_SIZE * 2, SCENE_SIZE * 2);
+            const groundMaterial = new THREE.MeshLambertMaterial({ color: 0xF5DEB3 });
+            ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+        }
+
+        // Bâtiment agrandi et recoloré
+        function createBuilding() {
+            const buildingGroup = new THREE.Group();
+
+            // Corps principal - DOUBLÉ EN TAILLE (4x3x3 -> 8x6x6)
+            const buildingGeometry = new THREE.BoxGeometry(8, 6, 6);
+            const buildingMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 });
+            const buildingMesh = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            buildingMesh.position.y = 3;
+            buildingMesh.castShadow = true;
+            buildingMesh.receiveShadow = true;
+            buildingGroup.add(buildingMesh);
+
+            // Toit - DOUBLÉ EN TAILLE
+            const roofGeometry = new THREE.ConeGeometry(5, 3, 4);
+            const roofMaterial = new THREE.MeshLambertMaterial({ color: 0xB22222 });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 7.5;
+            roof.rotation.y = Math.PI / 4;
+            roof.castShadow = true;
+            buildingGroup.add(roof);
+
+            // Fenêtres
+            const windowGeometry = new THREE.PlaneGeometry(1.6, 2.4);
+            const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x87CEEB });
+            
+            for (let i = 0; i < 3; i++) {
+                const window = new THREE.Mesh(windowGeometry, windowMaterial);
+                window.position.set(-3 + i * 3, 3, 3.01);
+                buildingGroup.add(window);
+            }
+
+            // Porte
+            const doorGeometry = new THREE.PlaneGeometry(1.6, 4);
+            const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x4B0082 });
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 2, 3.01);
+            buildingGroup.add(door);
+
+            building = buildingGroup;
+            scene.add(building);
+        }
+
+        // Création du soleil
+        function createSun() {
+            const sunGroup = new THREE.Group();
+
+            // Corps du soleil
+            const sunGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const sunMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xFDB813,
+                emissive: 0xFDB813,
+                emissiveIntensity: 0.3
+            });
+            const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
+            sunGroup.add(sunMesh);
+
+            // Auréole
+            const haloGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const haloMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xFFD700,
+                transparent: true,
+                opacity: 0.2
+            });
+            const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+            sunGroup.add(halo);
+
+            // Rayons
+            for (let i = 0; i < 8; i++) {
+                const rayGeometry = new THREE.CylinderGeometry(0.02, 0.02, 2);
+                const rayMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700 });
+                const ray = new THREE.Mesh(rayGeometry, rayMaterial);
+                
+                const angle = (i / 8) * Math.PI * 2;
+                ray.position.set(Math.cos(angle) * 1.2, 0, Math.sin(angle) * 1.2);
+                ray.rotation.z = angle;
+                sunGroup.add(ray);
+            }
+
+            sun = sunGroup;
+            scene.add(sun);
+        }
+
+        // Création des trajectoires saisonnières
+        function createSeasonalPaths() {
+    // Clear previous seasonal paths and free memory
+    if (Array.isArray(seasonalPaths)) {
+        seasonalPaths.forEach(p => {
+            try { scene.remove(p); } catch(e){}
+            try { p.geometry && p.geometry.dispose && p.geometry.dispose(); } catch(e){}
+            try { p.material && p.material.dispose && p.material.dispose(); } catch(e){}
+        });
+        seasonalPaths = [];
+    }
+
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const seasonalDays = [
+                { day: 172, color: 0xff4444 }, // Solstice été
+                { day: 355, color: 0x4444ff }, // Solstice hiver
+                { day: 80, color: 0x44ff44 },  // Équinoxe printemps
+                { day: 266, color: 0x44ff44 }  // Équinoxe automne
+            ];
+
+            seasonalPaths.forEach(path => scene.remove(path));
+            seasonalPaths = [];
+
+            seasonalDays.forEach(season => {
+                const points = [];
+                
+                for (let hour = 6; hour <= 18; hour += 0.5) {
+                    const pos = calculateSolarPosition(season.day, hour, latitude, 0);
+                    if (pos.elevation > 0) {
+                        const coords = sphericalToCartesian(pos.azimuth, pos.elevation, SUN_DISTANCE);
+                        points.push(new THREE.Vector3(coords.x, coords.y, coords.z));
+                    }
+                }
+
+                if (points.length > 1) {
+                    const curve = new THREE.CatmullRomCurve3(points);
+                    const pathGeometry = new THREE.TubeGeometry(curve, 100, 0.05, 8, false);
+                    const pathMaterial = new THREE.MeshBasicMaterial({ color: season.color });
+                    const path = new THREE.Mesh(pathGeometry, pathMaterial);
+                    scene.add(path);
+                    seasonalPaths.push(path);
+                }
+            });
+        }
+
+        // Conversion sphérique vers cartésien
+        function sphericalToCartesian(azimuth, elevation, distance) {
+            const azimuthRad = (azimuth - 90) * DEGREES_TO_RADIANS;
+            const elevationRad = elevation * DEGREES_TO_RADIANS;
+            
+            const x = distance * Math.cos(elevationRad) * Math.cos(azimuthRad);
+            const z = distance * Math.cos(elevationRad) * Math.sin(azimuthRad);
+            const y = distance * Math.sin(elevationRad);
+            
+            return { x, y, z };
+        }
+
+        // Calculs astronomiques
+        
+// Kasten & Young 1989 — masse d'air apparente
+function airMassKY(elevDeg){
+  if (elevDeg <= 0) return Infinity;
+  const h = elevDeg;
+  return 1 / (Math.sin(h * DEGREES_TO_RADIANS) + 0.50572 * Math.pow(h + 6.07995, -1.6364));
+}
+function calculateSolarPosition(dayOfYear, hour, latitude, longitude) {
+            const declination = 23.45 * Math.sin(DEGREES_TO_RADIANS * (360 * (284 + dayOfYear) / 365));
+            
+            const B = DEGREES_TO_RADIANS * (360 * (dayOfYear - 1) / 365);
+            const equationOfTime = 4 * (0.000075 + 0.001868 * Math.cos(B) - 0.032077 * Math.sin(B) - 0.014615 * Math.cos(2 * B) - 0.04089 * Math.sin(2 * B));
+            
+            const solarTime = hour + longitude / 15 + equationOfTime / 60;
+            const hourAngle = 15 * (solarTime - 12);
+            
+            const latRad = latitude * DEGREES_TO_RADIANS;
+            const decRad = declination * DEGREES_TO_RADIANS;
+            const hourAngleRad = hourAngle * DEGREES_TO_RADIANS;
+            
+            const elevationRad = Math.asin(Math.sin(latRad) * Math.sin(decRad) + Math.cos(latRad) * Math.cos(decRad) * Math.cos(hourAngleRad));
+            const elevation = elevationRad * RADIANS_TO_DEGREES;
+            
+            const azimuthRad = Math.atan2(Math.sin(hourAngleRad), Math.cos(hourAngleRad) * Math.sin(latRad) - Math.tan(decRad) * Math.cos(latRad));
+            let azimuth = azimuthRad * RADIANS_TO_DEGREES;
+            
+            azimuth = azimuth + 180;
+            if (azimuth >= 360) azimuth -= 360;
+            if (azimuth < 0) azimuth += 360;
+            
+            const earthSunDistance = 1 - 0.0167 * Math.cos(DEGREES_TO_RADIANS * (360 * (dayOfYear - 4) / 365));
+            
+            const buildingOrientation = parseFloat(document.getElementById('building-orientation').value);
+            const incidenceAngle = Math.abs(azimuth - buildingOrientation);
+            const finalIncidenceAngle = incidenceAngle > 180 ? 360 - incidenceAngle : incidenceAngle;
+            
+            let directIrradiance = 0;
+            // CORRECTION P1: Protection complète et air mass Kasten & Young
+            if (elevation > 0 && finalIncidenceAngle < 90) {
+                const airMass = Math.min(airMassKY(elevation), 38); // Clamp à 38
+                const atmosphericAttenuation = Math.pow(0.7, Math.pow(airMass, 0.678));
+                const cosIncidence = Math.cos(finalIncidenceAngle * DEGREES_TO_RADIANS);
+                directIrradiance = SOLAR_CONSTANT * atmosphericAttenuation * cosIncidence / (earthSunDistance * earthSunDistance);
+            }
+            // Si elevation <= 0, directIrradiance reste 0
+            
+            return {
+                azimuth,
+                elevation,
+                declination,
+                hourAngle,
+                earthSunDistance,
+                directIrradiance,
+                incidenceAngle: finalIncidenceAngle
+            };
+        }
+
+        // Mettre à jour la position du soleil
+        function updateSunPosition() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const dayOfYear = parseInt(document.getElementById('date-slider').value);
+            const hour = parseFloat(document.getElementById('time-slider').value);
+            
+            const solarPos = calculateSolarPosition(dayOfYear, hour, latitude, longitude);
+            
+            
+            if (window.updateResultsPanel) updateResultsPanel(solarPos);
+if (solarPos.elevation > 0) {
+                const coords = sphericalToCartesian(solarPos.azimuth, solarPos.elevation, SUN_DISTANCE);
+                sun.position.set(coords.x, coords.y, coords.z);
+                sun.visible = true;
+                
+                // Mettre à jour la lumière directionnelle
+                sunLight.position.copy(sun.position);
+                sunLight.target.position.set(0, 0, 0);
+                sunLight.intensity = Math.max(0.3, solarPos.elevation / 90);
+            } else {
+                sun.visible = false;
+                sunLight.intensity = 0;
+            }
+            
+            return solarPos;
+        }
+
+        // Mettre à jour l'orientation du bâtiment
+        function updateBuildingOrientation() {
+            const orientation = parseFloat(document.getElementById('building-orientation').value);
+            building.rotation.y = orientation * DEGREES_TO_RADIANS;
+        }
+
+        // Mettre à jour l'affichage
+        function updateDisplay() {
+            const solarPos = updateSunPosition();
+            updateBuildingOrientation();
+            
+            // Mettre à jour les valeurs affichées
+            
+            
+            // Mettre à jour les labels de date et heure
+            const date = new Date(2024, 0, parseInt(document.getElementById('date-slider').value));
+            const dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            document.getElementById('current-date').textContent = dateStr;
+            
+            const hour = parseFloat(document.getElementById('time-slider').value);
+            const hourStr = Math.floor(hour).toString().padStart(2, '0') + ':' + 
+                           ((hour % 1) * 60).toString().padStart(2, '0');
+            document.getElementById('current-time').textContent = hourStr;
+        }
+
+        // Mettre à jour les infos d'orbite
+        function updateOrbitInfo() {
+            const distance = camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+            const azimuth = Math.atan2(camera.position.x, camera.position.z) * RADIANS_TO_DEGREES;
+            const elevation = Math.asin(camera.position.y / distance) * RADIANS_TO_DEGREES;
+            
+            document.getElementById('orbit-info').textContent = 
+                `Caméra - Azimut: ${azimuth.toFixed(0)}° | Élévation: ${elevation.toFixed(0)}° | Distance: ${distance.toFixed(1)}m`;
+        }
+
+        // Vues prédéfinies
+        function setView(viewType) {
+            const distance = 25;
+            
+            switch(viewType) {
+                case 'top':
+                    camera.position.set(0, distance, 0);
+                    break;
+                case 'side':
+                    camera.position.set(distance, 8, 0);
+                    break;
+                case 'iso':
+                    camera.position.set(distance * 0.6, distance * 0.6, distance * 0.6);
+                    break;
+                case 'free':
+                    camera.position.set(18, 18, 18);
+                    break;
+            }
+            camera.lookAt(0, 0, 0);
+            updateOrbitInfo();
+        }
+
+        // Définir une localisation avec test de validité
+        function setLocation(lat, lon) {
+            // Smoke test pour valider les coordonnées
+            const isValidLat = lat >= -90 && lat <= 90;
+            const isValidLon = lon >= -180 && lon <= 180;
+            
+            if (!smokeTest('Coordonnées valides', () => isValidLat && isValidLon)) {
+                console.error(`Coordonnées invalides: lat=${lat}, lon=${lon}`);
+                return;
+            }
+            
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+            createSeasonalPaths();
+            updateDisplay();
+            
+            // Test final : vérifier que les valeurs ont été mises à jour
+            smokeTest('Localisation définie', () => {
+                const newLat = parseFloat(document.getElementById('latitude').value);
+                const newLon = parseFloat(document.getElementById('longitude').value);
+                return Math.abs(newLat - lat) < 0.001 && Math.abs(newLon - lon) < 0.001;
+            });
+        }
+
+        // Animations
+        function animateDay() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            const timeSlider = document.getElementById('time-slider');
+            let hour = 6;
+            
+            function step() {
+                if (!isAnimating) return;
+                
+                timeSlider.value = hour;
+                updateDisplay();
+                
+                hour += 0.2;
+                if (hour <= 18) {
+                    animationId = setTimeout(() => requestAnimationFrame(step), 100);
+                } else {
+                    isAnimating = false;
+                }
+            }
+            step();
+        }
+
+        function animateYear() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            const dateSlider = document.getElementById('date-slider');
+            let day = 1;
+            
+            function step() {
+                if (!isAnimating) return;
+                
+                dateSlider.value = day;
+                updateDisplay();
+                
+                day += 2;
+                if (day <= 365) {
+                    animationId = setTimeout(() => requestAnimationFrame(step), 50);
+                } else {
+                    isAnimating = false;
+                }
+            }
+            step();
+        }
+
+        function stopAnimation() {
+            isAnimating = false;
+            if (animationId) {
+                clearTimeout(animationId);
+                animationId = null;
+            }
+        }
+
+        // Event listeners
+        function attachEventListeners() {
+            document.getElementById('latitude').addEventListener('input', () => {
+                createSeasonalPaths();
+                updateDisplay();
+            });
+            document.getElementById('longitude').addEventListener('input', updateDisplay);
+            document.getElementById('building-orientation').addEventListener('input', updateDisplay);
+            document.getElementById('date-slider').addEventListener('input', updateDisplay);
+            document.getElementById('time-slider').addEventListener('input', updateDisplay);
+        }
+
+        // Gestion du redimensionnement
+        function onWindowResize() {
+            const container = document.getElementById('threejs-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // Boucle d'animation
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+    </script>
+
+<!-- UI/UX CLEAN PATCH: Results + Sun Events; legacy 'Données calculées' removed -->
+<script>
+(function(){
+  function injectStyles(css){ const s=document.createElement('style'); s.textContent=css; document.head.appendChild(s); }
+  injectStyles(`
+    .panel{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin:12px 0}
+    .panel h3{margin:0 0 8px 0;font-size:16px}
+    .results-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .res-item{background:#f8f9fb;border-radius:10px;padding:10px}
+    .res-label{font-size:12px;color:#6b7280;margin-bottom:4px}
+    .res-value{font-size:18px;font-weight:600}
+    #threejs-container{position:relative}
+    .hint-pan{position:absolute;right:8px;bottom:8px;background:rgba(22,22,22,.65);color:#fff;padding:6px 8px;border-radius:8px;font-size:12px;backdrop-filter:saturate(120%) blur(2px)}
+  `);
+
+  function ensureResultsPanel(){
+    if (document.getElementById('results-panel')) return;
+    const anchor = document.querySelector('#controls') || document.querySelector('#sidebar') || document.body;
+    const panel = document.createElement('section');
+    panel.className='panel'; panel.id='results-panel';
+    panel.innerHTML = `
+      <h3>Résultats</h3>
+      <div class="results-grid" aria-live="polite">
+        <div class="res-item"><div class="res-label">Altitude</div><div class="res-value" id="res-alt">—</div></div>
+        <div class="res-item"><div class="res-label">Azimut</div><div class="res-value" id="res-az">—</div></div>
+        <div class="res-item"><div class="res-label">Irradiance</div><div class="res-value" id="res-irr">—</div></div>
+        <div class="res-item"><div class="res-label">Incidence</div><div class="res-value" id="res-inc">—</div></div>
+      </div>`;
+    anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+  }
+
+  function ensurePanHint(){
+    const host = document.getElementById('threejs-container');
+    if (!host || host.querySelector('.hint-pan')) return;
+    const hint=document.createElement('div');
+    hint.className='hint-pan';
+    hint.textContent='🖱️ Clic gauche = orbite • Clic droit = pan';
+    host.appendChild(hint);
+  }
+
+  window.updateResultsPanel = function(sp){
+    try{
+      const alt=(sp?.elevation ?? NaN), az=(sp?.azimuth ?? NaN),
+            irr=(sp?.directIrradiance ?? 0), inc=(sp?.incidenceAngle ?? NaN);
+      const fmtDeg=v=>isFinite(v)?`${v.toFixed(1)}°`:'—';
+      const fmtIrr=v=>isFinite(v)&&v>0?`${Math.round(v)} W/m²`:'0 W/m²';
+      const $=id=>document.getElementById(id);
+      if($('res-alt')) $('res-alt').textContent=fmtDeg(alt);
+      if($('res-az'))  $('res-az').textContent =fmtDeg(az);
+      if($('res-irr')) $('res-irr').textContent=fmtIrr(irr);
+      if($('res-inc')) $('res-inc').textContent=fmtDeg(inc);
+    }catch(e){ console.warn('updateResultsPanel error:', e); }
+  };
+
+  function injectSunEventsPanel(){
+    if (document.getElementById('sun-events-panel')) return;
+    const anchor = document.getElementById('results-panel') || document.querySelector('#controls') || document.body;
+    const panel = document.createElement('section');
+    panel.className='panel'; panel.id='sun-events-panel';
+    panel.innerHTML = `
+      <h3>Moments clés du soleil</h3>
+      <div class="results-grid">
+        <div class="res-item"><div class="res-label">Lever</div><div class="res-value" id="sunrise-val">—</div></div>
+        <div class="res-item"><div class="res-label">Midi solaire</div><div class="res-value" id="solarnoon-val">—</div></div>
+        <div class="res-item"><div class="res-label">Coucher</div><div class="res-value" id="sunset-val">—</div></div>
+        <div class="res-item"><div class="res-label">Altitude max</div><div class="res-value" id="maxalt-val">—</div></div>
+      </div>`;
+    anchor.parentNode.insertBefore(panel, anchor.nextSibling);
+  }
+
+  function toHM(hours){
+    if (!isFinite(hours)) return '—';
+    let h = Math.floor(hours), m = Math.round((hours - h) * 60);
+    if (m===60){ h+=1; m=0; } h=((h%24)+24)%24;
+    return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  }
+
+  function computeSunEvents(dayOfYear, latitude, longitude){
+    let prevElev=null, prevT=null;
+    let sunrise=NaN, sunset=NaN, maxAlt=-Infinity, tMax=NaN;
+    const step=0.25;
+    for (let t=0; t<=24; t+=step){
+      const pos = calculateSolarPosition(dayOfYear, t, latitude, longitude);
+      const elev = pos.elevation;
+      if (elev>maxAlt){ maxAlt=elev; tMax=t; }
+      if (prevElev!==null){
+        if ((prevElev <= 0 && elev > 0) || (prevElev >= 0 && elev < 0)){
+          const frac = prevElev===elev? 0 : (0 - prevElev)/(elev - prevElev);
+          const tcross = prevT + frac*(t - prevT);
+          if (elev > prevElev && isNaN(sunrise)) sunrise = tcross;
+          else if (elev < prevElev) sunset = tcross;
+        }
+      }
+      prevElev = elev; prevT = t;
+    }
+    return { sunrise, sunset, solarNoon: tMax, maxAltitude: maxAlt };
+  }
+
+  window.updateSunEventsPanel = function(){
+    try{
+      const dayOfYear = parseInt(document.getElementById('date-slider')?.value || '172', 10);
+      const latitude  = parseFloat(document.getElementById('latitude')?.value || '45');
+      const longitude = parseFloat(document.getElementById('longitude')?.value || '0');
+      const useCivil  = document.getElementById('use-civil')?.checked || false;
+      const tz        = parseFloat(document.getElementById('tz-offset')?.value || '0');
+
+      const ev = computeSunEvents(dayOfYear, latitude, longitude);
+      function display(hSolar){
+        if (!isFinite(hSolar)) return '—';
+        if (useCivil){ const hCivil = hSolar - tz + (longitude/15); return toHM(hCivil) + ' (civil≈)'; }
+        return toHM(hSolar) + ' (solaire)';
+      }
+      const $=id=>document.getElementById(id);
+      if($('sunrise-val'))   $('sunrise-val').textContent   = display(ev.sunrise);
+      if($('sunset-val'))    $('sunset-val').textContent    = display(ev.sunset);
+      if($('solarnoon-val')) $('solarnoon-val').textContent = display(ev.solarNoon);
+      if($('maxalt-val'))    $('maxalt-val').textContent    = isFinite(ev.maxAltitude)? ev.maxAltitude.toFixed(1)+'°' : '—';
+    }catch(e){ console.warn('updateSunEventsPanel error:', e); }
+  };
+
+  function bindRecompute(){
+    const ids=['date-slider','time-slider','latitude','longitude','tz-offset','use-civil'];
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el) return;
+      const evt=(el.tagName==='INPUT' && el.type==='range')?'input':'change';
+      el.addEventListener(evt, ()=>{ requestAnimationFrame(window.updateSunEventsPanel); });
+    });
+  }
+
+  function init(){
+    ensureResultsPanel();
+    injectSunEventsPanel();
+    ensurePanHint();
+    bindRecompute();
+    requestAnimationFrame(window.updateSunEventsPanel);
+  }
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+
+
+<!-- Reposition Results & Sun Events panels under controls and above the 3D scene -->
+<script>
+(function(){
+  function movePanels(){
+    var canvas   = document.getElementById('threejs-container');
+    var results  = document.getElementById('results-panel');
+    var events   = document.getElementById('sun-events-panel');
+
+    if (!results && !events) return;
+
+    // Try to find a reliable "controls" anchor:
+    var controls = document.getElementById('controls')
+                || document.getElementById('sidebar')
+                || (document.getElementById('time-slider') ? document.getElementById('time-slider').closest('div') : null)
+                || (canvas ? canvas.previousElementSibling : null);
+
+    if (controls && controls.parentNode) {
+      // Place Results right after controls
+      if (results) {
+        if (controls.nextSibling) {
+          controls.parentNode.insertBefore(results, controls.nextSibling);
+        } else {
+          controls.parentNode.appendChild(results);
+        }
+      }
+      // Place Events right after Results (if exists), else after controls
+      if (events) {
+        if (results && results.parentNode) {
+          results.after(events);
+        } else if (controls.nextSibling) {
+          controls.parentNode.insertBefore(events, controls.nextSibling);
+        } else {
+          controls.parentNode.appendChild(events);
+        }
+      }
+    } else if (canvas && canvas.parentNode) {
+      // Fallback: put them just before the canvas
+      if (results) canvas.parentNode.insertBefore(results, canvas);
+      if (events)  canvas.parentNode.insertBefore(events, canvas);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', movePanels);
+  } else {
+    movePanels();
+  }
+})();
+</script>
+
+</body>
+</html>
