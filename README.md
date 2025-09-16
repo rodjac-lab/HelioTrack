@@ -15,6 +15,11 @@ The tool displays the solar trajectory and helps visualize sunlight at different
 - Sélectionner un jour de l’année pour afficher la trajectoire correspondante.
 - Observer la position du soleil et son impact sur l’ensoleillement de la maison.
 
+## 📱 Mode responsive
+- Sous 1200 px de large, le panneau latéral droit devient un tiroir superposé accessible via le bouton « Afficher les résultats » situé au-dessus de la zone centrale.
+- Le tiroir peut être refermé via le bouton « ✕ Fermer », en appuyant sur `Échap` ou en touchant l’arrière-plan estompé.
+- La navigation entre les onglets du panneau a été vérifiée manuellement sur une largeur de fenêtre ≤ 1200 px.
+
 ## 🧪 Vérification des calculs solaires
 - Lancer `node tests/solarEngine.snapshots.mjs` pour comparer le moteur modulaire
   avec les formules historiques (36 combinaisons jour/heure/latitude + événements clés).

@@ -52,6 +52,20 @@ export function initRightPanel({ mount, store }) {
   const container = document.createElement("div");
   container.className = "right-panel";
 
+  const mobileHeader = document.createElement("div");
+  mobileHeader.className = "right-panel-mobile-header";
+  const mobileTitle = document.createElement("span");
+  mobileTitle.className = "right-panel-mobile-title";
+  mobileTitle.textContent = "Résultats et paramètres";
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.className = "panel-right-close";
+  closeButton.setAttribute("data-role", "right-panel-close");
+  closeButton.setAttribute("aria-label", "Fermer le panneau latéral");
+  closeButton.textContent = "✕ Fermer";
+  mobileHeader.appendChild(mobileTitle);
+  mobileHeader.appendChild(closeButton);
+
   const tabs = [
     { id: "results", label: "Results", element: resultsView.element },
     { id: "sun-events", label: "Sun events", element: eventsView.element },
@@ -91,9 +105,102 @@ export function initRightPanel({ mount, store }) {
     });
   }
 
+  container.appendChild(mobileHeader);
   container.appendChild(nav);
   container.appendChild(contentHost);
   mount.appendChild(container);
+
+  const toggleButton = document.querySelector('[data-role="right-panel-toggle"]');
+  const backdrop = document.getElementById("right-panel-backdrop");
+  const mediaQuery = window.matchMedia("(max-width: 1200px)");
+
+  let isDrawerOpen = false;
+
+  function updateToggleLabel(isOpen) {
+    if (!toggleButton) return;
+    const openLabel = toggleButton.dataset.openLabel || toggleButton.textContent.trim();
+    const closeLabel = toggleButton.dataset.closeLabel || openLabel;
+    const icon = isOpen ? "✖" : "📊";
+    const label = isOpen ? closeLabel : openLabel;
+    toggleButton.textContent = `${icon} ${label}`;
+  }
+
+  function isDrawerMode() {
+    return mediaQuery.matches;
+  }
+
+  function updateDrawerState(nextOpen) {
+    isDrawerOpen = nextOpen;
+    const drawerMode = isDrawerMode();
+    const shouldDisplay = drawerMode && nextOpen;
+
+    mount.classList.toggle("is-open", shouldDisplay);
+    if (toggleButton) {
+      toggleButton.setAttribute("aria-expanded", shouldDisplay ? "true" : "false");
+    }
+    updateToggleLabel(shouldDisplay);
+
+    if (backdrop) {
+      backdrop.classList.toggle("is-active", shouldDisplay);
+      backdrop.setAttribute("aria-hidden", shouldDisplay ? "false" : "true");
+    }
+    document.body.classList.toggle("right-panel-open", shouldDisplay);
+
+    if (drawerMode) {
+      mount.setAttribute("aria-hidden", shouldDisplay ? "false" : "true");
+    } else {
+      mount.removeAttribute("aria-hidden");
+    }
+  }
+
+  function closeDrawer() {
+    updateDrawerState(false);
+  }
+
+  function toggleDrawer() {
+    if (!isDrawerMode()) return;
+    updateDrawerState(!isDrawerOpen);
+  }
+
+  toggleButton?.addEventListener("click", toggleDrawer);
+  closeButton.addEventListener("click", closeDrawer);
+  backdrop?.addEventListener("click", closeDrawer);
+
+  function handleKeydown(event) {
+    if (!isDrawerMode()) return;
+    if (event.key === "Escape" && isDrawerOpen) {
+      closeDrawer();
+    }
+  }
+
+  function handleMediaChange() {
+    if (!isDrawerMode()) {
+      mount.classList.remove("is-open");
+      if (backdrop) {
+        backdrop.classList.remove("is-active");
+        backdrop.setAttribute("aria-hidden", "true");
+      }
+      document.body.classList.remove("right-panel-open");
+      mount.removeAttribute("aria-hidden");
+      if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", "false");
+      }
+      updateToggleLabel(false);
+      return;
+    }
+
+    updateDrawerState(isDrawerOpen);
+  }
+
+  window.addEventListener("keydown", handleKeydown);
+  if (mediaQuery.addEventListener) {
+    mediaQuery.addEventListener("change", handleMediaChange);
+  } else if (mediaQuery.addListener) {
+    mediaQuery.addListener(handleMediaChange);
+  }
+
+  updateDrawerState(false);
+  handleMediaChange();
 
   const latInput = inputsSection.querySelector("#input-lat");
   const lonInput = inputsSection.querySelector("#input-lon");
@@ -150,6 +257,25 @@ export function initRightPanel({ mount, store }) {
     destroy() {
       unsubscribe();
       mount.removeChild(container);
+      toggleButton?.removeEventListener("click", toggleDrawer);
+      closeButton.removeEventListener("click", closeDrawer);
+      backdrop?.removeEventListener("click", closeDrawer);
+      window.removeEventListener("keydown", handleKeydown);
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener("change", handleMediaChange);
+      } else if (mediaQuery.removeListener) {
+        mediaQuery.removeListener(handleMediaChange);
+      }
+      if (backdrop) {
+        backdrop.classList.remove("is-active");
+        backdrop.setAttribute("aria-hidden", "true");
+      }
+      document.body.classList.remove("right-panel-open");
+      mount.removeAttribute("aria-hidden");
+      if (toggleButton) {
+        toggleButton.setAttribute("aria-expanded", "false");
+        updateToggleLabel(false);
+      }
     },
   };
 }
