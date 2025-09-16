@@ -16,8 +16,10 @@ The tool displays the solar trajectory and helps visualize sunlight at different
 - Observer la position du soleil et son impact sur l’ensoleillement de la maison.
 
 ## 🧪 Vérification des calculs solaires
-- Lancer `node tests/solarEngine.snapshots.mjs` pour comparer le moteur modulaire
+- Lancer `npm run test:snapshots` pour comparer le moteur modulaire
   avec les formules historiques (36 combinaisons jour/heure/latitude + événements clés).
+- Ce script doit absolument réussir **avant toute Pull Request** afin de garder le moteur
+  solaire sous contrôle et éviter toute dérive numérique.
 
 ---
 
