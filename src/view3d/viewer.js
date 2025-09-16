@@ -218,6 +218,8 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
 
   const width = Math.max(container.clientWidth, 1);
   const height = Math.max(container.clientHeight, 1);
+  let lastMeasuredWidth = width;
+  let lastMeasuredHeight = height;
 
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.set(15, 15, 15);
@@ -229,6 +231,32 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
+
+  let resizeObserver = null;
+  let resizeRafId = 0;
+
+  function attemptResize() {
+    if (container.clientWidth > 0 && container.clientHeight > 0) {
+      resize();
+      return true;
+    }
+    return false;
+  }
+
+  if (typeof window !== "undefined" && "ResizeObserver" in window) {
+    resizeObserver = new ResizeObserver(() => {
+      attemptResize();
+    });
+    resizeObserver.observe(container);
+  } else {
+    const monitorResize = () => {
+      attemptResize();
+      resizeRafId = requestAnimationFrame(monitorResize);
+    };
+    resizeRafId = requestAnimationFrame(monitorResize);
+  }
+
+  attemptResize();
 
   const hintPan = document.createElement("div");
   hintPan.className = "hint-pan";
@@ -341,6 +369,11 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
   function resize() {
     const w = Math.max(container.clientWidth, 1);
     const h = Math.max(container.clientHeight, 1);
+    if (w === lastMeasuredWidth && h === lastMeasuredHeight) {
+      return;
+    }
+    lastMeasuredWidth = w;
+    lastMeasuredHeight = h;
     renderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -355,6 +388,14 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
 
   function dispose() {
     cancelAnimationFrame(rafId);
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+    if (resizeRafId) {
+      cancelAnimationFrame(resizeRafId);
+      resizeRafId = 0;
+    }
     clearSeasonalPaths();
     disposeObject(ground);
     disposeObject(compassRose);
