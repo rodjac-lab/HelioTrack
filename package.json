@@ -1,0 +1,9 @@
+{
+  "name": "heliotrack",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test:snapshots": "node tests/solarEngine.snapshots.mjs"
+  }
+}

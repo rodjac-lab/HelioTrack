@@ -21,8 +21,10 @@ The tool displays the solar trajectory and helps visualize sunlight at different
 - La navigation entre les onglets du panneau a été vérifiée manuellement sur une largeur de fenêtre ≤ 1200 px.
 
 ## 🧪 Vérification des calculs solaires
-- Lancer `node tests/solarEngine.snapshots.mjs` pour comparer le moteur modulaire
+- Lancer `npm run test:snapshots` pour comparer le moteur modulaire
   avec les formules historiques (36 combinaisons jour/heure/latitude + événements clés).
+- Ce script doit absolument réussir **avant toute Pull Request** afin de garder le moteur
+  solaire sous contrôle et éviter toute dérive numérique.
 
 ---
 
