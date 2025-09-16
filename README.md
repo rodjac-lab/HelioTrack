@@ -16,9 +16,10 @@ The tool displays the solar trajectory and helps visualize sunlight at different
 - Observer la position du soleil et son impact sur l’ensoleillement de la maison.
 
 ## 📱 Mode responsive
-- Sous 1200 px de large, le panneau latéral droit devient un tiroir superposé accessible via le bouton « Afficher les résultats » situé au-dessus de la zone centrale.
-- Le tiroir peut être refermé via le bouton « ✕ Fermer », en appuyant sur `Échap` ou en touchant l’arrière-plan estompé.
-- La navigation entre les onglets du panneau a été vérifiée manuellement sur une largeur de fenêtre ≤ 1200 px.
+- ≥ 1200 px : les trois colonnes restent visibles. Le panneau de droite peut se comprimer grâce à `minmax(280px, 360px)` tandis que la zone centrale utilise `minmax(0, 1fr)` pour éviter tout défilement horizontal.
+- Entre 900 px et 1200 px : le panneau droit se transforme en tiroir superposé, accessible via le bouton « Afficher les résultats » ajouté au-dessus de la barre d’outils centrale. Il se referme avec « ✕ Fermer », la touche `Échap` ou un appui sur l’arrière-plan estompé.
+- ≤ 900 px : la colonne gauche est masquée afin de laisser toute la largeur au contenu principal ; le tiroir droit reste accessible via le même bouton.
+- Tests manuels réalisés sur un viewport de 1366 px (~14″) et sur des largeurs inférieures (tablette et mobile) pour vérifier l’accessibilité du tiroir et l’absence de débordement horizontal.
 
 ## 🧪 Vérification des calculs solaires
 - Lancer `npm run test:snapshots` pour comparer le moteur modulaire

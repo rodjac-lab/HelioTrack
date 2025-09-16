@@ -52,6 +52,34 @@ export function initRightPanel({ mount, store }) {
   const container = document.createElement("div");
   container.className = "right-panel";
 
+  const centerHost = document.getElementById("center");
+  const toolbarHost = document.getElementById("toolbar");
+  let toggleWrapper = null;
+  let toggleButton = null;
+
+  if (centerHost) {
+    toggleWrapper = document.createElement("div");
+    toggleWrapper.className = "panel-right-toggle-wrapper";
+
+    toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.className = "panel-right-toggle";
+    toggleButton.dataset.role = "right-panel-toggle";
+    toggleButton.dataset.openLabel = "Afficher les résultats";
+    toggleButton.dataset.closeLabel = "Masquer les résultats";
+    toggleButton.setAttribute("aria-controls", mount.id || "right");
+    toggleButton.setAttribute("aria-expanded", "false");
+    toggleButton.textContent = "📊 Afficher les résultats";
+
+    toggleWrapper.appendChild(toggleButton);
+
+    const referenceNode =
+      toolbarHost && toolbarHost.parentElement === centerHost
+        ? toolbarHost
+        : centerHost.firstChild;
+    centerHost.insertBefore(toggleWrapper, referenceNode || null);
+  }
+
   const mobileHeader = document.createElement("div");
   mobileHeader.className = "right-panel-mobile-header";
   const mobileTitle = document.createElement("span");
@@ -110,7 +138,6 @@ export function initRightPanel({ mount, store }) {
   container.appendChild(contentHost);
   mount.appendChild(container);
 
-  const toggleButton = document.querySelector('[data-role="right-panel-toggle"]');
   const backdrop = document.getElementById("right-panel-backdrop");
   const mediaQuery = window.matchMedia("(max-width: 1200px)");
 
@@ -275,6 +302,9 @@ export function initRightPanel({ mount, store }) {
       if (toggleButton) {
         toggleButton.setAttribute("aria-expanded", "false");
         updateToggleLabel(false);
+      }
+      if (toggleWrapper && toggleWrapper.parentElement) {
+        toggleWrapper.parentElement.removeChild(toggleWrapper);
       }
     },
   };

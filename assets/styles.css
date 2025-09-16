@@ -1,15 +1,15 @@
 html, body, #app { height: 100%; margin: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; color: #1f2933; }
 .grid {
   display: grid;
-  grid-template-columns: 260px 1fr 360px;
+  grid-template-columns: 260px minmax(0, 1fr) minmax(280px, 360px);
   grid-template-rows: 100%;
   grid-template-areas: "left center right";
   height: 100%;
   background: #f5f7fb;
 }
 .panel-left  { grid-area: left;  overflow: auto; background: #fafafa; border-right: 1px solid #e5e7eb; padding: 12px; }
-.panel-center{ grid-area: center; display: flex; flex-direction: column; background: #fff; }
-.panel-right { grid-area: right; overflow: auto; background: #fafafa; border-left: 1px solid #e5e7eb; padding: 16px; }
+.panel-center{ grid-area: center; display: flex; flex-direction: column; background: #fff; min-width: 0; }
+.panel-right { grid-area: right; overflow: auto; background: #fafafa; border-left: 1px solid #e5e7eb; padding: 16px; min-width: 0; }
 #toolbar { padding: .5rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; }
 
 .panel-right-toggle-wrapper { display: none; }
@@ -215,7 +215,7 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 1200px) {
   .grid {
-    grid-template-columns: 56px 1fr;
+    grid-template-columns: 56px minmax(0, 1fr);
     grid-template-areas: "left center";
   }
   .panel-left { padding: 8px; }
@@ -267,7 +267,7 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 900px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "center";
   }
   .panel-left { display: none; }
