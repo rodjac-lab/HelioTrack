@@ -1,10 +1,16 @@
 // src/logic/sunMath.js
-// Utilitaires numériques et solaires (PRÉPARATION — on branchera plus tard)
+// Utilitaires numériques et solaires — version consolidée depuis le legacy
 
 export const DEG2RAD = Math.PI / 180;
 export const RAD2DEG = 180 / Math.PI;
+export const SOLAR_CONSTANT = 1361; // W/m²
 
 export function clamp(x, min, max) { return Math.min(max, Math.max(min, x)); }
+
+export function normalizeAngleDeg(angle) {
+  const normalized = angle % 360;
+  return normalized < 0 ? normalized + 360 : normalized;
+}
 
 // ---- Conversions géométriques de base ----
 export function toCartesian({ r, thetaRad, phiRad }) {
@@ -15,18 +21,21 @@ export function toCartesian({ r, thetaRad, phiRad }) {
   return { x, y, z };
 }
 
-// ---- Astronomie simplifiée (placeholders à compléter lors de l’extraction) ----
-// Ces fonctions seront remplies avec TES formules actuelles (déclinaison, EoT, etc.)
-// quand on migrera depuis le gros HTML.
+// ---- Astronomie solaire (extrait du legacy) ----
 export function solarDeclination(dayOfYear) {
-  // TODO: remplacer par ta formule existante
-  // ex. approx: 23.44° * sin(2π * (284+N) / 365)
-  return 23.44 * Math.sin(((2 * Math.PI) * (284 + dayOfYear)) / 365);
+  // 23.45° * sin(360° * (284 + N) / 365)
+  return 23.45 * Math.sin(DEG2RAD * (360 * (284 + dayOfYear) / 365));
 }
 
 export function equationOfTime(dayOfYear) {
-  // TODO: remplacer par ta formule existante (minutes)
-  return 0; 
+  const B = DEG2RAD * (360 * (dayOfYear - 1) / 365);
+  return 4 * (
+    0.000075 +
+    0.001868 * Math.cos(B) -
+    0.032077 * Math.sin(B) -
+    0.014615 * Math.cos(2 * B) -
+    0.04089  * Math.sin(2 * B)
+  );
 }
 
 export function hourAngle(localSolarTimeHours) {
@@ -34,18 +43,53 @@ export function hourAngle(localSolarTimeHours) {
   return (localSolarTimeHours - 12) * 15;
 }
 
-export function solarAltAz({ latDeg, lonDeg, dayOfYear, localTimeHours, buildingOrientationDeg = 0 }) {
-  // TODO: lire EoT, décalage LST, déclinaison, etc. et renvoyer { altitudeDeg, azimuthDeg }
-  // Placeholder très simple (sera remplacé par ton calcul réel)
-  const alt = clamp(60 - Math.abs(12 - localTimeHours) * 10, 0, 75);
-  const az  = (localTimeHours / 24) * 360; // faux pour l’instant, juste un stub
-  return { altitudeDeg: alt, azimuthDeg: az + buildingOrientationDeg };
+export function earthSunDistanceAu(dayOfYear) {
+  return 1 - 0.0167 * Math.cos(DEG2RAD * (360 * (dayOfYear - 4) / 365));
 }
 
-// Transmittance atmosphérique type (placeholder)
+export function solarAltAz({ latDeg, lonDeg, dayOfYear, localTimeHours, buildingOrientationDeg = 0 }) {
+  const declinationDeg = solarDeclination(dayOfYear);
+  const equationOfTimeMinutes = equationOfTime(dayOfYear);
+  const localSolarTimeHours = localTimeHours + lonDeg / 15 + equationOfTimeMinutes / 60;
+  const hourAngleDegValue = hourAngle(localSolarTimeHours);
+
+  const latRad = latDeg * DEG2RAD;
+  const decRad = declinationDeg * DEG2RAD;
+  const hourAngleRad = hourAngleDegValue * DEG2RAD;
+
+  const sinElevation = (
+    Math.sin(latRad) * Math.sin(decRad) +
+    Math.cos(latRad) * Math.cos(decRad) * Math.cos(hourAngleRad)
+  );
+  const elevationRad = Math.asin(clamp(sinElevation, -1, 1));
+  const altitudeDeg = elevationRad * RAD2DEG;
+
+  const azimuthRad = Math.atan2(
+    Math.sin(hourAngleRad),
+    Math.cos(hourAngleRad) * Math.sin(latRad) - Math.tan(decRad) * Math.cos(latRad)
+  );
+  let azimuthDeg = azimuthRad * RAD2DEG + 180;
+  azimuthDeg = normalizeAngleDeg(azimuthDeg);
+
+  const azimuthFromOrientationDeg = normalizeAngleDeg(azimuthDeg - buildingOrientationDeg);
+
+  return {
+    altitudeDeg,
+    azimuthDeg,
+    azimuthFromOrientationDeg,
+    declinationDeg,
+    equationOfTimeMinutes,
+    localSolarTimeHours,
+    hourAngleDeg: hourAngleDegValue
+  };
+}
+
+// Kasten & Young 1989 — masse d'air apparente
 export function airMassKY(altitudeDeg) {
-  // TODO: remplacer par ta version
-  const altRad = altitudeDeg * DEG2RAD;
-  const m = 1 / Math.max(0.1, Math.sin(altRad));
-  return clamp(m, 1, 10);
+  if (altitudeDeg <= 0) return Infinity;
+  const h = altitudeDeg;
+  return 1 / (
+    Math.sin(h * DEG2RAD) +
+    0.50572 * Math.pow(h + 6.07995, -1.6364)
+  );
 }

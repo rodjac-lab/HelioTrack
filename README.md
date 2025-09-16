@@ -11,15 +11,25 @@ The tool displays the solar trajectory and helps visualize sunlight at different
 ---
 
 ## 🚀 Utilisation / Usage
-- Ouvrir le fichier `index.html` dans un navigateur web.  
-- Sélectionner un jour de l’année pour afficher la trajectoire correspondante.  
+- Ouvrir le fichier `index.html` dans un navigateur web.
+- Sélectionner un jour de l’année pour afficher la trajectoire correspondante.
 - Observer la position du soleil et son impact sur l’ensoleillement de la maison.
+
+## 🧪 Vérification des calculs solaires
+- Lancer `node tests/solarEngine.snapshots.mjs` pour comparer le moteur modulaire
+  avec les formules historiques (36 combinaisons jour/heure/latitude + événements clés).
+
+## 🧰 Développement
+- Le layout “trois panneaux” (`assets/styles.css`) s’adapte désormais aux écrans moyens :
+  la colonne droite passe en tiroir sous 1200 px et reste accessible via le bouton “📊 Onglets”.
+- Les modules `src/view3d/viewer.js` et `src/ui/rightPanel.js` utilisent un `ResizeObserver`
+  et un store pub/sub (`src/state/store.js`) pour réagir aux changements sans accès direct au DOM legacy.
 
 ---
 
 ## 📂 Structure prévue du projet
-- `index.html` → page principale du simulateur  
-- `src/` → fichiers JavaScript et modules  
+- `index.html` → page principale du simulateur
+- `src/` → fichiers JavaScript et modules
 - `assets/` → styles, images, données statiques  
 
 ---
