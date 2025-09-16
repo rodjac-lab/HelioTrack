@@ -1,10 +1,10 @@
 import { store } from "./state/store.js";
+import { calculateSolarPosition } from "./logic/rules.js";
 
-// PR1: rien de connecté encore. On prépare juste les hooks.
-// Exemple: plus tard, on branchera ici l'UI gauche/droite + 3D + charts.
-store.subscribe((_change, snapshot) => {
-  // future: applyRules(snapshot); update3D(snapshot); updateCharts(snapshot);
-  // pour l’instant on ne touche pas à l’app legacy.
+store.subscribe((_chg, snapshot) => {
+  // Bientôt: applyRules(snapshot), update3D(snapshot), updateCharts(snapshot)
 });
 
-console.log("[HelioTrack] Skeleton ready (PR1).");
+console.log("[HelioTrack] PR2 prep ready. Example call:", 
+  calculateSolarPosition({ dayOfYear: 172, localTimeHours: 12, latDeg: 45.76, lonDeg: 4.83, buildingOrientationDeg: 0 })
+);
