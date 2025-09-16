@@ -1,0 +1,16 @@
+html, body, #app { height: 100%; margin: 0; }
+.grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 360px; /* gauche / centre / droite */
+  grid-template-rows: 100%;
+  grid-template-areas: "left center right";
+  height: 100%;
+}
+.panel-left  { grid-area: left;  overflow: auto; background: #fafafa; border-right: 1px solid #eee; }
+.panel-center{ grid-area: center; display: grid; grid-template-rows: auto 1fr; }
+.panel-right { grid-area: right; overflow: auto; background: #fafafa; border-left: 1px solid #eee; }
+#toolbar { padding: .5rem 1rem; border-bottom: 1px solid #eee; }
+#legacy-app { display: block; }
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: 56px 1fr 0; } /* collapse left, hide right */
+}
