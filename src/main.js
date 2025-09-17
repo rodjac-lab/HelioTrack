@@ -3,7 +3,7 @@ import { calculateSolarPosition, computeSunEvents } from "./logic/rules.js";
 import { createViewer } from "./view3d/viewer.js";
 import { attachOrbitControls, setViewPreset } from "./view3d/controls3d.js";
 import { initLeftPanel } from "./ui/leftPanel.js";
-import { initRightPanel } from "./ui/rightPanel.js";
+import { initRightPanel } from "./ui/rightPanel/index.js";
 import { initToolbar } from "./ui/toolbar.js";
 import { initSmoke } from "./ui/smoke.js";
 
@@ -48,59 +48,110 @@ function handlePresetChange(preset) {
   controls.sync();
 }
 
-let animationMode = "idle";
-let animationTimer = null;
+function createAnimationRunner() {
+  const getNow = () =>
+    typeof performance !== "undefined" && typeof performance.now === "function"
+      ? performance.now()
+      : Date.now();
+  let frameId = null;
+  let current = null;
 
-function clearAnimationTimer() {
-  if (animationTimer !== null) {
-    clearTimeout(animationTimer);
-    animationTimer = null;
+  function stop() {
+    if (frameId !== null) {
+      cancelAnimationFrame(frameId);
+      frameId = null;
+    }
+    current = null;
   }
+
+  function start({ key, durationMs, onProgress, onComplete }) {
+    stop();
+    const startTime = getNow();
+    current = { key, durationMs: Math.max(0, durationMs), onProgress, onComplete, startTime };
+
+    if (onProgress) {
+      onProgress(0);
+    }
+
+    const step = (timestamp) => {
+      if (!current || current.key !== key) return;
+      const now = typeof timestamp === "number" ? timestamp : getNow();
+      const elapsed = now - current.startTime;
+      const progress = current.durationMs === 0 ? 1 : Math.min(1, elapsed / current.durationMs);
+      if (current.onProgress) {
+        current.onProgress(progress);
+      }
+      if (progress < 1) {
+        frameId = requestAnimationFrame(step);
+      } else {
+        frameId = null;
+        current.onComplete?.();
+        current = null;
+      }
+    };
+
+    frameId = requestAnimationFrame(step);
+  }
+
+  function is(key) {
+    return current?.key === key;
+  }
+
+  return { start, stop, is };
 }
 
+const animationRunner = createAnimationRunner();
+let activeAnimation = "idle";
+
 function stopAnimation() {
-  animationMode = "idle";
-  clearAnimationTimer();
+  activeAnimation = "idle";
+  animationRunner.stop();
 }
 
 function startDayAnimation() {
   stopAnimation();
-  animationMode = "day";
-  let hour = 6;
-  const step = () => {
-    if (animationMode !== "day") return;
-    store.set("localTimeHours", Math.round(hour * 10) / 10);
-    hour += 0.2;
-    if (hour <= 18.0001) {
-      animationTimer = setTimeout(() => requestAnimationFrame(step), 100);
-    } else {
+  activeAnimation = "day";
+  animationRunner.start({
+    key: "day",
+    durationMs: 6000,
+    onProgress: (progress) => {
+      if (!animationRunner.is("day")) return;
+      const hour = 6 + (18 - 6) * progress;
+      store.set("localTimeHours", Math.round(hour * 10) / 10);
+    },
+    onComplete: () => {
       stopAnimation();
-    }
-  };
-  step();
+      store.set("localTimeHours", 18);
+    },
+  });
 }
 
 function startYearAnimation() {
   stopAnimation();
-  animationMode = "year";
-  let day = 1;
-  const step = () => {
-    if (animationMode !== "year") return;
-    store.set("dayOfYear", Math.round(day));
-    day += 2;
-    if (day <= 365.5) {
-      animationTimer = setTimeout(() => requestAnimationFrame(step), 50);
-    } else {
+  activeAnimation = "year";
+  animationRunner.start({
+    key: "year",
+    durationMs: 9000,
+    onProgress: (progress) => {
+      if (!animationRunner.is("year")) return;
+      const day = 1 + (365 - 1) * progress;
+      store.set("dayOfYear", Math.round(day));
+    },
+    onComplete: () => {
       stopAnimation();
-    }
-  };
-  step();
+      store.set("dayOfYear", 365);
+    },
+  });
 }
 
 function handleAnimationCommand(command) {
-  if (command === "day") startDayAnimation();
-  else if (command === "year") startYearAnimation();
-  else stopAnimation();
+  if (command === "day") {
+    startDayAnimation();
+  } else if (command === "year") {
+    startYearAnimation();
+  } else {
+    stopAnimation();
+  }
 }
 
 initToolbar({
@@ -120,6 +171,17 @@ const rightPanel = initRightPanel({ mount: rightMount, store });
 window.addEventListener("resize", () => viewer.resize());
 
 let lastLatitude = store.get("latDeg");
+let lastSunEventsInput = null;
+let lastSunEventsResult = null;
+
+function hasSameEventInputs(a, b) {
+  return (
+    a?.dayOfYear === b?.dayOfYear &&
+    a?.latDeg === b?.latDeg &&
+    a?.lonDeg === b?.lonDeg &&
+    a?.buildingOrientationDeg === b?.buildingOrientationDeg
+  );
+}
 
 function applyState(snapshot) {
   const requiredKeys = ["dayOfYear", "localTimeHours", "latDeg", "lonDeg", "buildingOrientationDeg"];
@@ -143,12 +205,19 @@ function applyState(snapshot) {
     lastLatitude = snapshot.latDeg;
   }
 
-  const events = computeSunEvents({
+  const eventsInput = {
     dayOfYear: snapshot.dayOfYear,
     latDeg: snapshot.latDeg,
     lonDeg: snapshot.lonDeg,
     buildingOrientationDeg: snapshot.buildingOrientationDeg,
-  });
+  };
+
+  if (!hasSameEventInputs(eventsInput, lastSunEventsInput)) {
+    lastSunEventsResult = computeSunEvents(eventsInput);
+    lastSunEventsInput = { ...eventsInput };
+  }
+
+  const events = lastSunEventsResult;
   rightPanel.updateSunEvents(events, {
     useCivilTime: snapshot.useCivilTime,
     timezoneOffsetHours: snapshot.timezoneOffsetHours,
@@ -159,8 +228,8 @@ function applyState(snapshot) {
 applyState(store.getAll());
 store.subscribe((change, snapshot) => {
   if (change?.key === "dayOfYear" || change?.key === "localTimeHours") {
-    if (animationMode !== "idle") {
-      // keep animation running but nothing special
+    if (activeAnimation !== "idle") {
+      // animation is driving the state updates
     }
   }
   applyState(snapshot);

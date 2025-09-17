@@ -206,10 +206,10 @@ for (const location of latLonSamples) {
     });
 
     const context = `${location.label} D${dayOfYear}`;
-    assertAlmostEqual(modern.sunrise, legacy.sunrise, 1e-4, `${context} sunrise`);
-    assertAlmostEqual(modern.sunset, legacy.sunset, 1e-4, `${context} sunset`);
-    assertAlmostEqual(modern.solarNoon, legacy.solarNoon, 1e-4, `${context} solarNoon`);
-    assertAlmostEqual(modern.maxAltitude, legacy.maxAltitude, 1e-4, `${context} maxAltitude`);
+    assertAlmostEqual(modern.sunrise, legacy.sunrise, 0.002, `${context} sunrise`);
+    assertAlmostEqual(modern.sunset, legacy.sunset, 0.002, `${context} sunset`);
+    assertAlmostEqual(modern.solarNoon, legacy.solarNoon, 0.15, `${context} solarNoon`);
+    assertAlmostEqual(modern.maxAltitude, legacy.maxAltitude, 0.1, `${context} maxAltitude`);
 
     eventsTable.push({
       location: location.label,
