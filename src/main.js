@@ -1,7 +1,7 @@
 import { store } from "./state/store.js";
 import { calculateSolarPosition, computeSunEvents } from "./logic/rules.js";
 import { createViewer } from "./view3d/viewer.js";
-import { attachOrbitControls, setViewPreset, updateOrbitInfo } from "./view3d/controls3d.js";
+import { attachOrbitControls, setViewPreset } from "./view3d/controls3d.js";
 import { initLeftPanel } from "./ui/leftPanel.js";
 import { initRightPanel } from "./ui/rightPanel.js";
 import { initToolbar } from "./ui/toolbar.js";
@@ -38,23 +38,13 @@ const viewer = createViewer({
 smoke.run("Initialisation conteneur", () => !!viewerHost);
 smoke.run("Three.js prêt", () => !!viewer?.renderer?.domElement);
 
-let toolbarApi = null;
 const controls = attachOrbitControls({
   camera: viewer.camera,
   domElement: viewer.renderer.domElement,
-  onChange: () => {
-    const info = updateOrbitInfo({ camera: viewer.camera });
-    toolbarApi?.setOrbitInfo(info.text);
-  },
 });
 
-function refreshOrbitInfo() {
-  const info = updateOrbitInfo({ camera: viewer.camera });
-  toolbarApi?.setOrbitInfo(info.text);
-}
-
 function handlePresetChange(preset) {
-  setViewPreset({ camera: viewer.camera, preset, onChange: refreshOrbitInfo });
+  setViewPreset({ camera: viewer.camera, preset });
   controls.sync();
 }
 
@@ -113,12 +103,11 @@ function handleAnimationCommand(command) {
   else stopAnimation();
 }
 
-toolbarApi = initToolbar({
+initToolbar({
   mount: toolbarMount,
   onPresetChange: handlePresetChange,
   onAnimationCommand: handleAnimationCommand,
 });
-refreshOrbitInfo();
 
 initLeftPanel({
   mount: leftMount,

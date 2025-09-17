@@ -15,10 +15,6 @@ export function initToolbar({ mount, onPresetChange, onAnimationCommand }) {
       <button type="button" class="toolbar-btn" data-anim="year">🗓️ Année</button>
       <button type="button" class="toolbar-btn" data-anim="stop">⏹️ Stop</button>
     </div>
-    <div class="toolbar-group toolbar-info">
-      <span class="toolbar-title">Caméra</span>
-      <span class="orbit-info" data-role="orbit-info">—</span>
-    </div>
   `;
   mount.appendChild(container);
 
@@ -34,11 +30,4 @@ export function initToolbar({ mount, onPresetChange, onAnimationCommand }) {
     });
   });
 
-  const orbitInfoEl = container.querySelector('[data-role="orbit-info"]');
-
-  return {
-    setOrbitInfo(text) {
-      orbitInfoEl.textContent = text;
-    },
-  };
 }

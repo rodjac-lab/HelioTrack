@@ -1,5 +1,3 @@
-import { RAD2DEG } from "../logic/sunMath.js";
-
 function getThree() {
   const THREE = window.THREE;
   if (!THREE) {
@@ -83,7 +81,7 @@ export function attachOrbitControls({ camera, domElement, onChange }) {
   };
 }
 
-export function setViewPreset({ camera, preset, onChange }) {
+export function setViewPreset({ camera, preset }) {
   const distance = 25;
   switch (preset) {
     case "top":
@@ -101,27 +99,5 @@ export function setViewPreset({ camera, preset, onChange }) {
       break;
   }
   camera.lookAt(0, 0, 0);
-  if (onChange) onChange();
 }
 
-export function updateOrbitInfo({ camera, element }) {
-  const position = camera.position;
-  const distance = position.length();
-  const azimuth = Math.atan2(position.x, position.z) * RAD2DEG;
-  const elevation = Math.asin(position.y / (distance || 1)) * RAD2DEG;
-
-  const normalizedAzimuth = Number.isFinite(azimuth) ? azimuth : 0;
-  const normalizedElevation = Number.isFinite(elevation) ? elevation : 0;
-  const normalizedDistance = Number.isFinite(distance) ? distance : 0;
-
-  const text = `Caméra - Azimut: ${normalizedAzimuth.toFixed(0)}° | Élévation: ${normalizedElevation.toFixed(0)}° | Distance: ${normalizedDistance.toFixed(1)}m`;
-  if (element) {
-    element.textContent = text;
-  }
-  return {
-    azimuth: normalizedAzimuth,
-    elevation: normalizedElevation,
-    distance: normalizedDistance,
-    text,
-  };
-}
