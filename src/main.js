@@ -120,6 +120,17 @@ const rightPanel = initRightPanel({ mount: rightMount, store });
 window.addEventListener("resize", () => viewer.resize());
 
 let lastLatitude = store.get("latDeg");
+let lastSunEventsInput = null;
+let lastSunEventsResult = null;
+
+function hasSameEventInputs(a, b) {
+  return (
+    a?.dayOfYear === b?.dayOfYear &&
+    a?.latDeg === b?.latDeg &&
+    a?.lonDeg === b?.lonDeg &&
+    a?.buildingOrientationDeg === b?.buildingOrientationDeg
+  );
+}
 
 function applyState(snapshot) {
   const requiredKeys = ["dayOfYear", "localTimeHours", "latDeg", "lonDeg", "buildingOrientationDeg"];
@@ -143,12 +154,19 @@ function applyState(snapshot) {
     lastLatitude = snapshot.latDeg;
   }
 
-  const events = computeSunEvents({
+  const eventsInput = {
     dayOfYear: snapshot.dayOfYear,
     latDeg: snapshot.latDeg,
     lonDeg: snapshot.lonDeg,
     buildingOrientationDeg: snapshot.buildingOrientationDeg,
-  });
+  };
+
+  if (!hasSameEventInputs(eventsInput, lastSunEventsInput)) {
+    lastSunEventsResult = computeSunEvents(eventsInput);
+    lastSunEventsInput = { ...eventsInput };
+  }
+
+  const events = lastSunEventsResult;
   rightPanel.updateSunEvents(events, {
     useCivilTime: snapshot.useCivilTime,
     timezoneOffsetHours: snapshot.timezoneOffsetHours,
