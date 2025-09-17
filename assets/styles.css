@@ -124,7 +124,6 @@ input[type="range"]::-moz-range-thumb {
   transition: background 0.2s, transform 0.2s;
 }
 .toolbar-btn:hover { background: #e5f0ff; transform: translateY(-1px); }
-.toolbar-info { margin-left: auto; }
 
 .viewer-host {
   position: relative;
