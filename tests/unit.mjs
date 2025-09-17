@@ -161,5 +161,4 @@ assert.ok(!domElement.eventListeners.pointerdown, "Pointer handlers should be re
 
 delete global.window;
 
-
 console.log("All unit checks passed");
