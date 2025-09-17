@@ -5,9 +5,10 @@ const PRESETS = [
   { label: "Oslo", lat: 59.9133, lon: 10.7390 },
 ];
 
-function formatDayOfYear(day) {
-  const base = new Date(Date.UTC(2024, 0, 1));
-  base.setUTCDate(day);
+export function formatDayOfYear(day) {
+  const value = Number.isFinite(day) ? Math.min(Math.max(1, Math.round(day)), 365) : 1;
+  const base = new Date(Date.UTC(2021, 0, 1));
+  base.setUTCDate(value);
   return base.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
@@ -48,8 +49,7 @@ export function initLeftPanel({ mount, store, onManualChange }) {
     btn.className = "preset-btn";
     btn.textContent = preset.label;
     btn.addEventListener("click", () => {
-      store.set("latDeg", preset.lat);
-      store.set("lonDeg", preset.lon);
+      store.setMany({ latDeg: preset.lat, lonDeg: preset.lon });
       onManualChange?.("preset");
     });
     presetHost.appendChild(btn);
