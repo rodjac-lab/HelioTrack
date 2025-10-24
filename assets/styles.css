@@ -1,24 +1,16 @@
-html,
-body,
-#app {
-  height: 100%;
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #1f2933;
-  background: radial-gradient(circle at 0% -20%, #ffffff 0%, #eef2ff 55%, #e0f2fe 120%);
-}
+html, body, #app { height: 100%; margin: 0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; color: #1f2933; }
 .grid {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) minmax(280px, 360px);
   grid-template-rows: 100%;
   grid-template-areas: "left center right";
   height: 100%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(236, 244, 255, 0.85) 45%, rgba(224, 242, 254, 0.75) 100%);
+  background: #f5f7fb;
 }
-.panel-left  { grid-area: left;  overflow: auto; background: rgba(255, 255, 255, 0.82); border-right: 1px solid rgba(148, 163, 184, 0.25); padding: 12px; backdrop-filter: blur(6px); }
-.panel-center{ grid-area: center; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.88); min-width: 0; }
-.panel-right { grid-area: right; overflow: auto; background: rgba(255, 255, 255, 0.82); border-left: 1px solid rgba(148, 163, 184, 0.25); padding: 16px; min-width: 0; backdrop-filter: blur(6px); }
-#toolbar { padding: .5rem 1rem; border-bottom: 1px solid rgba(148, 163, 184, 0.25); background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); }
+.panel-left  { grid-area: left;  overflow: auto; background: #fafafa; border-right: 1px solid #e5e7eb; padding: 12px; }
+.panel-center{ grid-area: center; display: flex; flex-direction: column; background: #fff; min-width: 0; }
+.panel-right { grid-area: right; overflow: auto; background: #fafafa; border-left: 1px solid #e5e7eb; padding: 16px; min-width: 0; }
+#toolbar { padding: .5rem 1rem; border-bottom: 1px solid #e5e7eb; background: #fff; }
 
 .panel-right-toggle-wrapper { display: none; }
 .panel-right-toggle {
@@ -60,12 +52,10 @@ body,
 .left-panel { display: flex; flex-direction: column; gap: 12px; }
 
 .panel {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: 0 18px 45px rgba(148, 163, 184, 0.18);
-  border: 1px solid rgba(226, 232, 240, 0.6);
-  backdrop-filter: blur(6px);
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
 }
 
 .panel-compact h3 { margin: 0 0 8px; font-size: 16px; }
@@ -140,10 +130,8 @@ input[type="range"]::-moz-range-thumb {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: radial-gradient(circle at top, #eff6ff 0%, #dbeafe 40%, #ecfdf5 100%);
+  background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 50%, #DEB887 100%);
   flex: 1 1 auto;
-  border-radius: 18px 18px 0 0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .seasonal-legend {
