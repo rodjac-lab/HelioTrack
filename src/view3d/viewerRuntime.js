@@ -4,6 +4,14 @@ export function createRenderer({ THREE, container, camera }) {
   renderer.setSize(Math.max(container.clientWidth, 1), Math.max(container.clientHeight, 1));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.physicallyCorrectLights = true;
+  if ("outputColorSpace" in renderer && THREE.SRGBColorSpace) {
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+  }
+  if ("toneMapping" in renderer && THREE.ACESFilmicToneMapping) {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+  }
   container.appendChild(renderer.domElement);
   return renderer;
 }
