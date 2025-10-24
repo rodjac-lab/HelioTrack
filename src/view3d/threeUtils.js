@@ -24,14 +24,32 @@ export function disposeObject(object) {
     object.forEach(disposeObject);
     return;
   }
-  if (object.geometry) {
-    object.geometry.dispose?.();
-  }
-  if (object.material) {
-    if (Array.isArray(object.material)) {
-      object.material.forEach((mat) => mat?.dispose?.());
-    } else {
-      object.material.dispose?.();
+  const geometries = new Set();
+  const materials = new Set();
+
+  const recordDisposable = (item) => {
+    if (!item) return;
+    if (item.geometry) {
+      geometries.add(item.geometry);
     }
+    const { material } = item;
+    if (material) {
+      if (Array.isArray(material)) {
+        material.forEach((mat) => mat && materials.add(mat));
+      } else {
+        materials.add(material);
+      }
+    }
+  };
+
+  if (typeof object.traverse === "function") {
+    object.traverse((child) => {
+      recordDisposable(child);
+    });
+  } else {
+    recordDisposable(object);
   }
+
+  geometries.forEach((geometry) => geometry?.dispose?.());
+  materials.forEach((material) => material?.dispose?.());
 }

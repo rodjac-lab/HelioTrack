@@ -14,20 +14,28 @@ import { createRenderer, createResizeController, createRenderLoop } from "./view
 export function createViewer({ container, initialLatitude, initialOrientationDeg = 0 }) {
   const THREE = ensureThree();
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb);
+  scene.background = new THREE.Color(0xeef3fb);
+  scene.fog = new THREE.Fog(0xeef3fb, 45, 120);
 
   const width = Math.max(container.clientWidth, 1);
   const height = Math.max(container.clientHeight, 1);
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.position.set(15, 15, 15);
+  const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+  camera.position.set(12, 11, 16);
   camera.lookAt(0, 0, 0);
 
   const renderer = createRenderer({ THREE, container, camera });
   const resizeController = createResizeController({ container, camera, renderer });
   const renderLoop = createRenderLoop({ renderer, scene, camera });
 
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+  const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.35);
   scene.add(ambientLight);
+
+  const hemisphereLight = new THREE.HemisphereLight(0xeaf2ff, 0xe8ddc5, 0.8);
+  scene.add(hemisphereLight);
+
+  const fillLight = new THREE.DirectionalLight(0xffffff, 0.25);
+  fillLight.position.set(-14, 18, -8);
+  scene.add(fillLight);
 
   const sunLight = createSunLight(THREE);
   scene.add(sunLight);
