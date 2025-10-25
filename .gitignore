@@ -1,2 +1,9 @@
 # Dependencies
 /node_modules
+
+# Build output
+/dist
+
+# Local dev-server logs
+/devserver.log
+/devserver.err
