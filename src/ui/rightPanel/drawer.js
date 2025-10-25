@@ -17,7 +17,9 @@ function createToggleButton({ mount, centerHost, toolbarHost }) {
   wrapper.appendChild(button);
 
   const referenceNode =
-    toolbarHost && toolbarHost.parentElement === centerHost ? toolbarHost : centerHost.firstChild;
+    toolbarHost && toolbarHost.parentElement === centerHost
+      ? toolbarHost
+      : centerHost.firstChild;
   centerHost.insertBefore(wrapper, referenceNode || null);
 
   return { button, wrapper };

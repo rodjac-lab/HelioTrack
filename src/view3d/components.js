@@ -134,11 +134,18 @@ export function createCompassRose(THREE) {
     const angle = (dir.angle * Math.PI) / 180;
     const isMain = index % 4 === 0;
     const isSecondary = index % 2 === 0;
-    const rayLength = isMain ? radius : isSecondary ? radius * 0.7 : radius * 0.5;
+    const rayLength = isMain
+      ? radius
+      : isSecondary
+        ? radius * 0.7
+        : radius * 0.5;
     ctx.beginPath();
     ctx.moveTo(center, center);
     ctx.lineWidth = isMain ? 3 : isSecondary ? 2 : 1;
-    ctx.lineTo(center + Math.sin(angle) * rayLength, center - Math.cos(angle) * rayLength);
+    ctx.lineTo(
+      center + Math.sin(angle) * rayLength,
+      center - Math.cos(angle) * rayLength,
+    );
     ctx.stroke();
   });
 
@@ -181,7 +188,11 @@ export function createSunController({ sun, sunLight }) {
   return {
     updatePosition({ altitudeDeg = 0, azimuthDeg = 0 }) {
       if (altitudeDeg > 0) {
-        const coords = sphericalToCartesian(azimuthDeg, altitudeDeg, SUN_DISTANCE);
+        const coords = sphericalToCartesian(
+          azimuthDeg,
+          altitudeDeg,
+          SUN_DISTANCE,
+        );
         sun.visible = true;
         sun.position.set(coords.x, coords.y, coords.z);
         sunLight.position.copy(sun.position);

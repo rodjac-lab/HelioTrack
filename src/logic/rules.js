@@ -7,7 +7,7 @@ import {
   solarAltAz,
   airMassKY,
   earthSunDistanceAu,
-  SOLAR_CONSTANT
+  SOLAR_CONSTANT,
 } from "./sunMath.js";
 
 function minimalAzimuthDifference(angleDeg) {
@@ -21,11 +21,12 @@ function minimalAzimuthDifference(angleDeg) {
  */
 export function calculateSolarPosition(params) {
   const {
-    dayOfYear,          // 1..365
-    localTimeHours,     // ex: 13.5 pour 13h30
-    latDeg, lonDeg,     // latitude/longitude
+    dayOfYear, // 1..365
+    localTimeHours, // ex: 13.5 pour 13h30
+    latDeg,
+    lonDeg, // latitude/longitude
     buildingOrientationDeg = 0, // orientation maison
-    radius = 10         // rayon "scène" pour placement
+    radius = 10, // rayon "scène" pour placement
   } = params;
 
   const geometry = solarAltAz({
@@ -33,7 +34,7 @@ export function calculateSolarPosition(params) {
     lonDeg,
     dayOfYear,
     localTimeHours,
-    buildingOrientationDeg
+    buildingOrientationDeg,
   });
 
   const {
@@ -43,13 +44,13 @@ export function calculateSolarPosition(params) {
     declinationDeg,
     equationOfTimeMinutes,
     localSolarTimeHours,
-    hourAngleDeg
+    hourAngleDeg,
   } = geometry;
 
   const xyz = toCartesian({
     r: radius,
     thetaRad: azimuthDeg * DEG2RAD,
-    phiRad: altitudeDeg * DEG2RAD
+    phiRad: altitudeDeg * DEG2RAD,
   });
 
   const airMass = airMassKY(altitudeDeg);
@@ -59,9 +60,13 @@ export function calculateSolarPosition(params) {
   let directIrradiance = 0;
   if (altitudeDeg > 0 && incidenceAngleDeg < 90) {
     const effectiveAirMass = Math.min(airMass, 38);
-    const atmosphericAttenuation = Math.pow(0.7, Math.pow(effectiveAirMass, 0.678));
+    const atmosphericAttenuation = Math.pow(
+      0.7,
+      Math.pow(effectiveAirMass, 0.678),
+    );
     const cosIncidence = Math.cos(incidenceAngleDeg * DEG2RAD);
-    directIrradiance = (SOLAR_CONSTANT * atmosphericAttenuation * cosIncidence) /
+    directIrradiance =
+      (SOLAR_CONSTANT * atmosphericAttenuation * cosIncidence) /
       (earthSunDistance * earthSunDistance);
   }
 
@@ -83,7 +88,7 @@ export function calculateSolarPosition(params) {
     incidenceAngleDeg,
     incidenceAngle: incidenceAngleDeg,
     isAboveHorizon: altitudeDeg > 0,
-    xyz
+    xyz,
   };
 }
 
@@ -173,7 +178,9 @@ export function computeSunEvents({
   for (let t = coarseStep; t <= 24 + 1e-9; t += coarseStep) {
     const currentTime = Math.min(t, 24);
     const elevation = sample(currentTime);
-    const crossing = (prevElevation <= 0 && elevation > 0) || (prevElevation >= 0 && elevation < 0);
+    const crossing =
+      (prevElevation <= 0 && elevation > 0) ||
+      (prevElevation >= 0 && elevation < 0);
     if (crossing) {
       const refined = refineCrossing(prevTime, currentTime);
       if (elevation > prevElevation && Number.isNaN(sunrise)) {

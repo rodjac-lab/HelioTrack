@@ -19,7 +19,10 @@ export function initRightPanel({ mount, store }) {
 
   mount.appendChild(layout.container);
 
-  const drawer = createDrawerController({ mount, closeButton: layout.closeButton });
+  const drawer = createDrawerController({
+    mount,
+    closeButton: layout.closeButton,
+  });
   const binder = createInputsBinder({ section: inputsSection, store });
 
   const unsubscribe = store.subscribe((_, snapshot) => {

@@ -29,5 +29,4 @@ export function initToolbar({ mount, onPresetChange, onAnimationCommand }) {
       onAnimationCommand?.(btn.dataset.anim);
     });
   });
-
 }

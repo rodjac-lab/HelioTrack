@@ -49,9 +49,24 @@ const parisSolstice = computeSunEvents({
   latDeg: 48.8566,
   lonDeg: 2.3522,
 });
-approxEqual(parisSolstice.sunrise, 3.86, 0.05, "Paris sunrise should be close to 03:52 UTC");
-approxEqual(parisSolstice.sunset, 19.83, 0.05, "Paris sunset should be close to 19:49 UTC");
-approxEqual(parisSolstice.maxAltitude, 64.6, 0.3, "Paris max altitude should be around 64.6°");
+approxEqual(
+  parisSolstice.sunrise,
+  3.86,
+  0.05,
+  "Paris sunrise should be close to 03:52 UTC",
+);
+approxEqual(
+  parisSolstice.sunset,
+  19.83,
+  0.05,
+  "Paris sunset should be close to 19:49 UTC",
+);
+approxEqual(
+  parisSolstice.maxAltitude,
+  64.6,
+  0.3,
+  "Paris max altitude should be around 64.6°",
+);
 
 const tromsoMidnightSun = computeSunEvents({
   dayOfYear: 172,
@@ -59,7 +74,8 @@ const tromsoMidnightSun = computeSunEvents({
   lonDeg: 18.9553,
 });
 assert.ok(
-  Number.isNaN(tromsoMidnightSun.sunrise) && Number.isNaN(tromsoMidnightSun.sunset),
+  Number.isNaN(tromsoMidnightSun.sunrise) &&
+    Number.isNaN(tromsoMidnightSun.sunset),
   "Midnight sun locations should not report sunrise/sunset",
 );
 
@@ -157,7 +173,10 @@ domElement.eventListeners.pointerup({
 
 controls.dispose();
 
-assert.ok(!domElement.eventListeners.pointerdown, "Pointer handlers should be removed on dispose");
+assert.ok(
+  !domElement.eventListeners.pointerdown,
+  "Pointer handlers should be removed on dispose",
+);
 
 delete global.window;
 

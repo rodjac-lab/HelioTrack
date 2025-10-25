@@ -1,12 +1,14 @@
 const PRESETS = [
   { label: "Rome", lat: 41.9028, lon: 12.4964 },
-  { label: "Lyon", lat: 45.7640, lon: 4.8357 },
-  { label: "Amsterdam", lat: 52.3740, lon: 4.8952 },
-  { label: "Oslo", lat: 59.9133, lon: 10.7390 },
+  { label: "Lyon", lat: 45.764, lon: 4.8357 },
+  { label: "Amsterdam", lat: 52.374, lon: 4.8952 },
+  { label: "Oslo", lat: 59.9133, lon: 10.739 },
 ];
 
 export function formatDayOfYear(day) {
-  const value = Number.isFinite(day) ? Math.min(Math.max(1, Math.round(day)), 365) : 1;
+  const value = Number.isFinite(day)
+    ? Math.min(Math.max(1, Math.round(day)), 365)
+    : 1;
   const base = new Date(Date.UTC(2021, 0, 1));
   base.setUTCDate(value);
   return base.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });

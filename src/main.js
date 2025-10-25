@@ -67,7 +67,13 @@ function createAnimationRunner() {
   function start({ key, durationMs, onProgress, onComplete }) {
     stop();
     const startTime = getNow();
-    current = { key, durationMs: Math.max(0, durationMs), onProgress, onComplete, startTime };
+    current = {
+      key,
+      durationMs: Math.max(0, durationMs),
+      onProgress,
+      onComplete,
+      startTime,
+    };
 
     if (onProgress) {
       onProgress(0);
@@ -77,7 +83,10 @@ function createAnimationRunner() {
       if (!current || current.key !== key) return;
       const now = typeof timestamp === "number" ? timestamp : getNow();
       const elapsed = now - current.startTime;
-      const progress = current.durationMs === 0 ? 1 : Math.min(1, elapsed / current.durationMs);
+      const progress =
+        current.durationMs === 0
+          ? 1
+          : Math.min(1, elapsed / current.durationMs);
       if (current.onProgress) {
         current.onProgress(progress);
       }
@@ -184,7 +193,13 @@ function hasSameEventInputs(a, b) {
 }
 
 function applyState(snapshot) {
-  const requiredKeys = ["dayOfYear", "localTimeHours", "latDeg", "lonDeg", "buildingOrientationDeg"];
+  const requiredKeys = [
+    "dayOfYear",
+    "localTimeHours",
+    "latDeg",
+    "lonDeg",
+    "buildingOrientationDeg",
+  ];
   const missing = requiredKeys.some((key) => snapshot[key] === undefined);
   if (missing) return;
 

@@ -1,4 +1,9 @@
-export function createRightPanelLayout({ resultsView, eventsView, inputsSection, infoSection }) {
+export function createRightPanelLayout({
+  resultsView,
+  eventsView,
+  inputsSection,
+  infoSection,
+}) {
   const container = document.createElement("div");
   container.className = "right-panel";
 
@@ -20,10 +25,25 @@ export function createRightPanelLayout({ resultsView, eventsView, inputsSection,
   mobileHeader.appendChild(closeButton);
 
   const tabs = [
-    { id: "results", label: "Résultats", element: resultsView.element },
-    { id: "sun-events", label: "Événements solaires", element: eventsView.element },
-    { id: "inputs", label: "Paramètres", element: inputsSection },
-    { id: "info", label: "Aide 3D", element: infoSection },
+    {
+      id: "results",
+      label: "Résultats",
+      element: resultsView.element,
+      isDefault: true,
+    },
+    {
+      id: "sun-events",
+      label: "Événements",
+      element: eventsView.element,
+      isDefault: false,
+    },
+    {
+      id: "inputs",
+      label: "Paramètres",
+      element: inputsSection,
+      isDefault: false,
+    },
+    { id: "info", label: "Aide 3D", element: infoSection, isDefault: false },
   ];
 
   const nav = document.createElement("div");
@@ -46,13 +66,13 @@ export function createRightPanelLayout({ resultsView, eventsView, inputsSection,
     button.className = "tab-btn";
     button.textContent = tab.label;
     button.dataset.tab = tab.id;
-    if (index === 0) button.classList.add("active");
+    if (tab.isDefault || index === 0) button.classList.add("active");
     button.addEventListener("click", () => activate(tab.id));
     nav.appendChild(button);
 
     const wrapper = document.createElement("div");
     wrapper.className = "tab-panel";
-    if (index === 0) wrapper.classList.add("active");
+    if (tab.isDefault || index === 0) wrapper.classList.add("active");
     wrapper.dataset.tab = tab.id;
     wrapper.appendChild(tab.element);
     contentHost.appendChild(wrapper);

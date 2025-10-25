@@ -51,7 +51,8 @@ export function createResultsView() {
     const altitude = solarPosition.altitudeDeg ?? solarPosition.elevation;
     const azimuth = solarPosition.azimuthDeg ?? solarPosition.azimuth;
     const irradiance = solarPosition.directIrradiance;
-    const incidence = solarPosition.incidenceAngleDeg ?? solarPosition.incidenceAngle;
+    const incidence =
+      solarPosition.incidenceAngleDeg ?? solarPosition.incidenceAngle;
 
     fields.alt.textContent = formatDeg(altitude);
     fields.az.textContent = formatDeg(azimuth);
@@ -83,10 +84,13 @@ export function createSunEventsView() {
     maxalt: section.querySelector('[data-event="maxalt"]'),
   };
 
-  function formatTime(value, { useCivilTime, timezoneOffsetHours, longitudeDeg }) {
+  function formatTime(
+    value,
+    { useCivilTime, timezoneOffsetHours, longitudeDeg },
+  ) {
     if (!Number.isFinite(value)) return "—";
     if (useCivilTime) {
-      const civil = value - timezoneOffsetHours + (longitudeDeg / 15);
+      const civil = value - timezoneOffsetHours + longitudeDeg / 15;
       return `${toHM(civil)} (civil≈)`;
     }
     return `${toHM(value)} (solaire)`;
@@ -103,7 +107,9 @@ export function createSunEventsView() {
     fields.solarnoon.textContent = formatTime(events?.solarNoon, opts);
     fields.sunset.textContent = formatTime(events?.sunset, opts);
     const maxAlt = events?.maxAltitude;
-    fields.maxalt.textContent = Number.isFinite(maxAlt) ? `${maxAlt.toFixed(1)}°` : "—";
+    fields.maxalt.textContent = Number.isFinite(maxAlt)
+      ? `${maxAlt.toFixed(1)}°`
+      : "—";
   }
 
   return { element: section, update };

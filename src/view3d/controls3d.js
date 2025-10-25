@@ -60,21 +60,30 @@ export function attachOrbitControls({ camera, domElement, onChange, three }) {
     event.preventDefault();
   }
 
-  const supportsPointer = typeof window !== "undefined" && "PointerEvent" in window;
+  const supportsPointer =
+    typeof window !== "undefined" && "PointerEvent" in window;
   const disposers = [];
 
   if (supportsPointer) {
     domElement.style.touchAction = "none";
 
     const handlePointerDown = (event) => {
-      if (event.pointerType === "mouse" && event.button !== 0 && event.button !== 2) return;
+      if (
+        event.pointerType === "mouse" &&
+        event.button !== 0 &&
+        event.button !== 2
+      )
+        return;
       startDrag(event);
       domElement.setPointerCapture?.(event.pointerId);
       event.preventDefault();
     };
 
     const handlePointerMove = (event) => {
-      if (!state.dragging || (state.pointerId !== null && event.pointerId !== state.pointerId)) {
+      if (
+        !state.dragging ||
+        (state.pointerId !== null && event.pointerId !== state.pointerId)
+      ) {
         return;
       }
       updateDrag(event);

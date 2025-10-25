@@ -23,8 +23,16 @@ export function createInputsBinder({ section, store }) {
   const listeners = [
     [latInput, "change", () => handleNumberChange(latInput, "latDeg")],
     [lonInput, "change", () => handleNumberChange(lonInput, "lonDeg")],
-    [orientationInput, "change", () => handleNumberChange(orientationInput, "buildingOrientationDeg")],
-    [tzInput, "change", () => handleNumberChange(tzInput, "timezoneOffsetHours")],
+    [
+      orientationInput,
+      "change",
+      () => handleNumberChange(orientationInput, "buildingOrientationDeg"),
+    ],
+    [
+      tzInput,
+      "change",
+      () => handleNumberChange(tzInput, "timezoneOffsetHours"),
+    ],
     [civilCheckbox, "change", handleCheckboxChange],
   ];
 

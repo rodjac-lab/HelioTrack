@@ -9,9 +9,17 @@ import {
 } from "./components.js";
 import { createSeasonalPathManager } from "./seasonalPaths.js";
 import { createViewerOverlays } from "./viewerOverlays.js";
-import { createRenderer, createResizeController, createRenderLoop } from "./viewerRuntime.js";
+import {
+  createRenderer,
+  createResizeController,
+  createRenderLoop,
+} from "./viewerRuntime.js";
 
-export function createViewer({ container, initialLatitude, initialOrientationDeg = 0 }) {
+export function createViewer({
+  container,
+  initialLatitude,
+  initialOrientationDeg = 0,
+}) {
   const THREE = ensureThree();
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87ceeb);
@@ -23,7 +31,11 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
   camera.lookAt(0, 0, 0);
 
   const renderer = createRenderer({ THREE, container, camera });
-  const resizeController = createResizeController({ container, camera, renderer });
+  const resizeController = createResizeController({
+    container,
+    camera,
+    renderer,
+  });
   const renderLoop = createRenderLoop({ renderer, scene, camera });
 
   const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
@@ -57,7 +69,8 @@ export function createViewer({ container, initialLatitude, initialOrientationDeg
     renderer,
     updateSunPosition(solarPosition) {
       if (!solarPosition) return;
-      const altitudeDeg = solarPosition.altitudeDeg ?? solarPosition.elevation ?? 0;
+      const altitudeDeg =
+        solarPosition.altitudeDeg ?? solarPosition.elevation ?? 0;
       const azimuthDeg = solarPosition.azimuthDeg ?? solarPosition.azimuth ?? 0;
       sunController.updatePosition({ altitudeDeg, azimuthDeg });
     },
