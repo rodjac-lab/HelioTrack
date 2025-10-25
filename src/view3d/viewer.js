@@ -1,4 +1,4 @@
-import { ensureThree, disposeObject } from "./threeUtils.js";
+import { THREE, disposeObject } from "./threeUtils.js";
 import {
   createGround,
   createBuilding,
@@ -20,7 +20,6 @@ export function createViewer({
   initialLatitude,
   initialOrientationDeg = 0,
 }) {
-  const THREE = ensureThree();
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87ceeb);
 

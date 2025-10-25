@@ -1,13 +1,7 @@
+import * as THREE from "three";
 import { DEG2RAD } from "../logic/sunMath.js";
 
-export function ensureThree() {
-  if (typeof window === "undefined" || !window.THREE) {
-    throw new Error(
-      "Three.js n'est pas chargé. Ajoutez <script src=...three.min.js></script> avant main.js",
-    );
-  }
-  return window.THREE;
-}
+export { THREE };
 
 export function sphericalToCartesian(azimuthDeg, altitudeDeg, distance) {
   const azimuthRad = (azimuthDeg - 90) * DEG2RAD;

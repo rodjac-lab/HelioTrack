@@ -1,4 +1,4 @@
-import { ensureThree } from "./threeUtils.js";
+import { THREE } from "./threeUtils.js";
 
 function clampPhi(phi) {
   const epsilon = 0.1;
@@ -9,8 +9,7 @@ function normalizeRadius(radius) {
   return Math.max(5, Math.min(50, radius));
 }
 
-export function attachOrbitControls({ camera, domElement, onChange, three }) {
-  const THREE = three ?? ensureThree();
+export function attachOrbitControls({ camera, domElement, onChange }) {
   const spherical = new THREE.Spherical();
   spherical.setFromVector3(camera.position);
 

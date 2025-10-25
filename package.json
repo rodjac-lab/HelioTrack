@@ -4,6 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test:unit": "node tests/unit.mjs",
     "test:snapshots": "node tests/solarEngine.snapshots.mjs",
     "test": "npm run test:unit && npm run test:snapshots",
@@ -11,8 +14,13 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@types/three": "^0.180.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
   }
 }
