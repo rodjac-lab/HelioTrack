@@ -1,3 +1,5 @@
+import { formatTime } from "../utils/formatters.js";
+
 const PRESETS = [
   { label: "Rome", lat: 41.9028, lon: 12.4964 },
   { label: "Lyon", lat: 45.764, lon: 4.8357 },
@@ -14,13 +16,6 @@ export function formatDayOfYear(day) {
   return base.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
-function formatTime(hours) {
-  if (!Number.isFinite(hours)) return "--:--";
-  const h = Math.floor(hours);
-  const m = Math.round((hours - h) * 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
 export function initLeftPanel({ mount, store, onManualChange }) {
   const container = document.createElement("div");
   container.className = "left-panel";
@@ -32,14 +27,12 @@ export function initLeftPanel({ mount, store, onManualChange }) {
     <section class="panel panel-compact">
       <h3>Jour de l'année</h3>
       <label class="slider-label-legend">Jour sélectionné : <span data-label="date">21 mar</span></label>
-      <input type="range" min="1" max="365" step="1" data-input="day" />
-      <div class="slider-label"><span>1 Jan</span><span>31 Déc</span></div>
+      <input type="range" min="1" max="365" step="1" data-input="day" aria-label="Sélectionner le jour de l'année" aria-valuemin="1" aria-valuemax="365" />
     </section>
     <section class="panel panel-compact">
       <h3>Heure solaire</h3>
       <label class="slider-label-legend">Heure sélectionnée : <span data-label="time">12:00</span></label>
-      <input type="range" min="0" max="23.5" step="0.5" data-input="time" />
-      <div class="slider-label"><span>00:00</span><span>23:30</span></div>
+      <input type="range" min="0" max="23.5" step="0.5" data-input="time" aria-label="Sélectionner l'heure solaire" aria-valuemin="0" aria-valuemax="23.5" />
     </section>
   `;
   mount.appendChild(container);

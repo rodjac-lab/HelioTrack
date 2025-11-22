@@ -1,23 +1,8 @@
-function formatDeg(value) {
-  return Number.isFinite(value) ? `${value.toFixed(1)}°` : "—";
-}
-
-function formatIrradiance(value) {
-  if (!Number.isFinite(value) || value <= 0) return "0 W/m²";
-  return `${Math.round(value)} W/m²`;
-}
-
-function toHM(hours) {
-  if (!Number.isFinite(hours)) return "—";
-  let h = Math.floor(hours);
-  let m = Math.round((hours - h) * 60);
-  if (m === 60) {
-    h += 1;
-    m = 0;
-  }
-  h = ((h % 24) + 24) % 24;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
+import {
+  formatTime,
+  formatDegrees,
+  formatIrradiance,
+} from "../utils/formatters.js";
 
 export function createResultsView() {
   const section = document.createElement("section");
@@ -30,6 +15,7 @@ export function createResultsView() {
       <div class="res-item"><div class="res-label">Azimut</div><div class="res-value" data-res="az">—</div></div>
       <div class="res-item"><div class="res-label">Irradiance</div><div class="res-value" data-res="irr">—</div></div>
       <div class="res-item"><div class="res-label">Incidence</div><div class="res-value" data-res="inc">—</div></div>
+      <div class="res-item"><div class="res-label">Efficacité</div><div class="res-value" data-res="eff">—</div></div>
     </div>
   `;
 
@@ -38,6 +24,7 @@ export function createResultsView() {
     az: section.querySelector('[data-res="az"]'),
     irr: section.querySelector('[data-res="irr"]'),
     inc: section.querySelector('[data-res="inc"]'),
+    eff: section.querySelector('[data-res="eff"]'),
   };
 
   function update(solarPosition) {
@@ -54,10 +41,14 @@ export function createResultsView() {
     const incidence =
       solarPosition.incidenceAngleDeg ?? solarPosition.incidenceAngle;
 
-    fields.alt.textContent = formatDeg(altitude);
-    fields.az.textContent = formatDeg(azimuth);
+    fields.alt.textContent = formatDegrees(altitude);
+    fields.az.textContent = formatDegrees(azimuth);
     fields.irr.textContent = formatIrradiance(irradiance);
-    fields.inc.textContent = formatDeg(incidence);
+    fields.inc.textContent = formatDegrees(incidence);
+    fields.eff.textContent =
+      solarPosition.panelEfficiency != null
+        ? `${Math.round(solarPosition.panelEfficiency)}%`
+        : "—";
   }
 
   return { element: section, update };
@@ -84,16 +75,16 @@ export function createSunEventsView() {
     maxalt: section.querySelector('[data-event="maxalt"]'),
   };
 
-  function formatTime(
+  function formatEventTime(
     value,
     { useCivilTime, timezoneOffsetHours, longitudeDeg },
   ) {
     if (!Number.isFinite(value)) return "—";
     if (useCivilTime) {
       const civil = value - timezoneOffsetHours + longitudeDeg / 15;
-      return `${toHM(civil)} (civil≈)`;
+      return `${formatTime(civil)} (civil≈)`;
     }
-    return `${toHM(value)} (solaire)`;
+    return `${formatTime(value)} (solaire)`;
   }
 
   function update(events, options) {
@@ -103,9 +94,9 @@ export function createSunEventsView() {
       longitudeDeg: 0,
       ...(options || {}),
     };
-    fields.sunrise.textContent = formatTime(events?.sunrise, opts);
-    fields.solarnoon.textContent = formatTime(events?.solarNoon, opts);
-    fields.sunset.textContent = formatTime(events?.sunset, opts);
+    fields.sunrise.textContent = formatEventTime(events?.sunrise, opts);
+    fields.solarnoon.textContent = formatEventTime(events?.solarNoon, opts);
+    fields.sunset.textContent = formatEventTime(events?.sunset, opts);
     const maxAlt = events?.maxAltitude;
     fields.maxalt.textContent = Number.isFinite(maxAlt)
       ? `${maxAlt.toFixed(1)}°`

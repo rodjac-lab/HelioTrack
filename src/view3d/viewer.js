@@ -2,6 +2,7 @@ import { THREE, disposeObject } from "./threeUtils.js";
 import {
   createGround,
   createBuilding,
+  createSolarPanels,
   createSun,
   createSunLight,
   createCompassRose,
@@ -20,16 +21,17 @@ export function createViewer({
   initialLatitude,
   initialOrientationDeg = 0,
 }) {
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb);
+  try {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
 
-  const width = Math.max(container.clientWidth, 1);
-  const height = Math.max(container.clientHeight, 1);
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.position.set(15, 15, 15);
-  camera.lookAt(0, 0, 0);
+    const width = Math.max(container.clientWidth, 1);
+    const height = Math.max(container.clientHeight, 1);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    camera.position.set(15, 15, 15);
+    camera.lookAt(0, 0, 0);
 
-  const renderer = createRenderer({ THREE, container, camera });
+    const renderer = createRenderer({ THREE, container, camera });
   const resizeController = createResizeController({
     container,
     camera,
@@ -83,6 +85,20 @@ export function createViewer({
     resize() {
       resizeController.resize();
     },
+    toggleSolarPanels() {
+      // Check if panels already exist
+      const existing = scene.children.find(obj => obj.userData?.isSolarPanels);
+      if (existing) {
+        scene.remove(existing);
+        disposeObject(existing);
+        return false; // panels removed
+      }
+
+      const panels = createSolarPanels(THREE);
+      panels.userData.isSolarPanels = true;
+      scene.add(panels);
+      return true; // panels installed
+    },
     dispose() {
       renderLoop.stop();
       resizeController.dispose();
@@ -92,4 +108,15 @@ export function createViewer({
       renderer.dispose();
     },
   };
+  } catch (error) {
+    console.error("Failed to create 3D viewer:", error);
+    container.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--ui-text);">
+        <h2 style="margin-bottom: 16px;">Erreur d'initialisation 3D</h2>
+        <p style="margin-bottom: 8px;">Impossible d'initialiser le rendu 3D.</p>
+        <p style="font-size: 14px; color: var(--ui-text-muted);">Votre navigateur ne supporte peut-être pas WebGL.</p>
+      </div>
+    `;
+    return null;
+  }
 }

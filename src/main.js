@@ -15,6 +15,7 @@ const initialState = {
   buildingOrientationDeg: 180,
   timezoneOffsetHours: 0,
   useCivilTime: false,
+  panelsInstalled: false,
 };
 Object.entries(initialState).forEach(([key, value]) => store.set(key, value));
 
@@ -22,6 +23,12 @@ const leftMount = document.getElementById("left");
 const rightMount = document.getElementById("right");
 const center = document.getElementById("center");
 const toolbarMount = document.getElementById("toolbar");
+
+if (!leftMount || !rightMount || !center || !toolbarMount) {
+  throw new Error(
+    "Required DOM elements not found. Please check your HTML structure.",
+  );
+}
 
 const viewerHost = document.createElement("div");
 viewerHost.className = "viewer-host";
@@ -34,6 +41,10 @@ const viewer = createViewer({
   initialLatitude: store.get("latDeg"),
   initialOrientationDeg: store.get("buildingOrientationDeg"),
 });
+
+if (!viewer) {
+  throw new Error("Failed to initialize 3D viewer. WebGL may not be supported.");
+}
 
 smoke.run("Initialisation conteneur", () => !!viewerHost);
 smoke.run("Three.js prêt", () => !!viewer?.renderer?.domElement);
@@ -169,6 +180,12 @@ initToolbar({
   onAnimationCommand: handleAnimationCommand,
 });
 
+// Listen for install-panels event
+toolbarMount.addEventListener("install-panels", () => {
+  const installed = viewer.toggleSolarPanels();
+  store.set("panelsInstalled", installed);
+});
+
 initLeftPanel({
   mount: leftMount,
   store,
@@ -209,6 +226,7 @@ function applyState(snapshot) {
     latDeg: snapshot.latDeg,
     lonDeg: snapshot.lonDeg,
     buildingOrientationDeg: snapshot.buildingOrientationDeg,
+    panelsInstalled: snapshot.panelsInstalled,
   });
 
   viewer.updateSunPosition(solar);

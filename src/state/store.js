@@ -5,7 +5,13 @@ export function createStore(initial = {}) {
 
   function notify(change) {
     const snapshot = { ...state };
-    listeners.forEach((fn) => fn(change, snapshot));
+    listeners.forEach((fn) => {
+      try {
+        fn(change, snapshot);
+      } catch (error) {
+        console.error("Error in store listener:", error);
+      }
+    });
   }
 
   return {

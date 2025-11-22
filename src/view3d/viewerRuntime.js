@@ -1,14 +1,21 @@
 export function createRenderer({ THREE, container, camera }) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio || 1);
-  renderer.setSize(
-    Math.max(container.clientWidth, 1),
-    Math.max(container.clientHeight, 1),
-  );
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  container.appendChild(renderer.domElement);
-  return renderer;
+  try {
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio || 1);
+    renderer.setSize(
+      Math.max(container.clientWidth, 1),
+      Math.max(container.clientHeight, 1),
+    );
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
+    return renderer;
+  } catch (error) {
+    console.error("Failed to initialize WebGL renderer:", error);
+    throw new Error(
+      "WebGL n'est pas supporté par votre navigateur. Veuillez utiliser un navigateur moderne.",
+    );
+  }
 }
 
 export function createResizeController({ container, camera, renderer }) {

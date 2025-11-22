@@ -24,18 +24,17 @@ export function createRightPanelLayout({
   mobileHeader.appendChild(mobileTitle);
   mobileHeader.appendChild(closeButton);
 
+  // Créer un conteneur pour les indicateurs (résultats + événements)
+  const indicatorsContainer = document.createElement("div");
+  indicatorsContainer.appendChild(resultsView.element);
+  indicatorsContainer.appendChild(eventsView.element);
+
   const tabs = [
     {
-      id: "results",
-      label: "Résultats",
-      element: resultsView.element,
+      id: "indicators",
+      label: "Indicateurs",
+      element: indicatorsContainer,
       isDefault: true,
-    },
-    {
-      id: "sun-events",
-      label: "Événements",
-      element: eventsView.element,
-      isDefault: false,
     },
     {
       id: "inputs",

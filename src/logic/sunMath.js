@@ -57,6 +57,20 @@ export function solarAltAz({
   localTimeHours,
   buildingOrientationDeg = 0,
 }) {
+  // Validate inputs
+  if (latDeg < -90 || latDeg > 90) {
+    console.warn(`Invalid latitude: ${latDeg}. Clamping to [-90, 90]`);
+    latDeg = clamp(latDeg, -90, 90);
+  }
+  if (lonDeg < -180 || lonDeg > 180) {
+    console.warn(`Invalid longitude: ${lonDeg}. Wrapping to [-180, 180]`);
+    lonDeg = ((lonDeg + 180) % 360) - 180;
+  }
+  if (dayOfYear < 1 || dayOfYear > 365) {
+    console.warn(`Invalid day of year: ${dayOfYear}. Clamping to [1, 365]`);
+    dayOfYear = clamp(dayOfYear, 1, 365);
+  }
+
   const declinationDeg = solarDeclination(dayOfYear);
   const equationOfTimeMinutes = equationOfTime(dayOfYear);
   const localSolarTimeHours =
@@ -76,7 +90,7 @@ export function solarAltAz({
   const azimuthRad = Math.atan2(
     Math.sin(hourAngleRad),
     Math.cos(hourAngleRad) * Math.sin(latRad) -
-      Math.tan(decRad) * Math.cos(latRad),
+    Math.tan(decRad) * Math.cos(latRad),
   );
   let azimuthDeg = azimuthRad * RAD2DEG + 180;
   azimuthDeg = normalizeAngleDeg(azimuthDeg);
@@ -101,4 +115,39 @@ export function airMassKY(altitudeDeg) {
   if (altitudeDeg <= 0) return Infinity;
   const h = altitudeDeg;
   return 1 / (Math.sin(h * DEG2RAD) + 0.50572 * Math.pow(h + 6.07995, -1.6364));
+}
+
+export function calculatePanelEfficiency({
+  azimuthDeg,
+  altitudeDeg,
+  panelAzimuthDeg = 180, // Sud par défaut
+  panelTiltDeg = 30, // Pente du toit par défaut
+}) {
+  if (!Number.isFinite(altitudeDeg) || altitudeDeg <= 0) return 0;
+  if (!Number.isFinite(azimuthDeg)) return 0;
+
+  const sunAltRad = altitudeDeg * DEG2RAD;
+  const sunAzRad = azimuthDeg * DEG2RAD;
+  const panelTiltRad = panelTiltDeg * DEG2RAD;
+  const panelAzRad = panelAzimuthDeg * DEG2RAD;
+
+  // Vecteur solaire
+  const sx = Math.cos(sunAltRad) * Math.sin(sunAzRad);
+  const sy = Math.sin(sunAltRad);
+  const sz = Math.cos(sunAltRad) * Math.cos(sunAzRad);
+
+  // Vecteur normal du panneau
+  // Pour un panneau incliné vers l'azimuth panelAzRad
+  // nx = sin(tilt) * sin(az)
+  // ny = cos(tilt)
+  // nz = sin(tilt) * cos(az)
+  const nx = Math.sin(panelTiltRad) * Math.sin(panelAzRad);
+  const ny = Math.cos(panelTiltRad);
+  const nz = Math.sin(panelTiltRad) * Math.cos(panelAzRad);
+
+  // Produit scalaire = cos(angle d'incidence)
+  const dot = sx * nx + sy * ny + sz * nz;
+
+  // Efficacité = max(0, cos(incidence)) * 100
+  return Math.max(0, dot) * 100;
 }

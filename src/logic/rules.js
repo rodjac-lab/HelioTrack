@@ -8,6 +8,7 @@ import {
   airMassKY,
   earthSunDistanceAu,
   SOLAR_CONSTANT,
+  calculatePanelEfficiency,
 } from "./sunMath.js";
 
 function minimalAzimuthDifference(angleDeg) {
@@ -27,6 +28,7 @@ export function calculateSolarPosition(params) {
     lonDeg, // latitude/longitude
     buildingOrientationDeg = 0, // orientation maison
     radius = 10, // rayon "scène" pour placement
+    panelsInstalled = false, // panneaux solaires installés
   } = params;
 
   const geometry = solarAltAz({
@@ -70,6 +72,17 @@ export function calculateSolarPosition(params) {
       (earthSunDistance * earthSunDistance);
   }
 
+  // Calculer l'efficacité des panneaux solaires si installés
+  let panelEfficiency = null;
+  if (panelsInstalled) {
+    panelEfficiency = calculatePanelEfficiency({
+      azimuthDeg,
+      altitudeDeg,
+      panelAzimuthDeg: buildingOrientationDeg,
+      panelTiltDeg: 30,
+    });
+  }
+
   return {
     altitudeDeg,
     elevation: altitudeDeg,
@@ -89,6 +102,7 @@ export function calculateSolarPosition(params) {
     incidenceAngle: incidenceAngleDeg,
     isAboveHorizon: altitudeDeg > 0,
     xyz,
+    panelEfficiency,
   };
 }
 
