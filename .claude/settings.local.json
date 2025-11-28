@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: configure GitHub Pages deployment with correct base path\n\n- Add base: \"/HelioTrack/\" to Vite config for proper asset paths\n- Add GitHub Actions workflow to automatically build and deploy to Pages\n\nThis fixes the 404 error on GitHub Pages where assets were not found\nbecause they were being served from the wrong path.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint)",
+      "Bash(npx eslint:*)",
+      "Bash(find:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

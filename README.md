@@ -42,6 +42,13 @@ Simulateur de la course du soleil face a une maison. Le projet affiche la trajec
 - `assets/` : styles, images et donnees statiques.
 - `tests/` : harness numerique et snapshots.
 
+### Déploiement (GitHub Pages)
+Ce projet utilise Vite et nécessite une étape de build. Pour le déployer sur GitHub Pages :
+1. Allez dans les **Settings** du dépôt sur GitHub.
+2. Section **Pages** > **Build and deployment**.
+3. Sous **Source**, sélectionnez **GitHub Actions**.
+4. Le workflow `Deploy to GitHub Pages` (défini dans `.github/workflows/deploy.yml`) prendra automatiquement le relais lors du prochain push sur `main`.
+
 ## EN
 Interactive 3D solar path simulator with solar panel efficiency analysis. It displays the sun's trajectory for any day of the year and shows the sunlight impact around the building with real-time metrics.
 
@@ -75,6 +82,13 @@ Interactive 3D solar path simulator with solar panel efficiency analysis. It dis
 - 900 px -> 1199 px: the right column becomes an overlay drawer toggled by the “Afficher les resultats / Show results” button, closable via “Fermer / Close”, `Esc`, or the dimmed backdrop.
 - < 900 px: the left column is hidden so the main canvas gets the full width; the drawer button still controls the results panel.
 - Manual checks were done on a 1366 px laptop viewport plus smaller tablet/mobile widths.
+
+### Deployment (GitHub Pages)
+This project uses Vite and requires a build step. To deploy on GitHub Pages:
+1. Go to repository **Settings** on GitHub.
+2. Section **Pages** > **Build and deployment**.
+3. Under **Source**, select **GitHub Actions**.
+4. The `Deploy to GitHub Pages` workflow (defined in `.github/workflows/deploy.yml`) will automatically handle the deployment on the next push to `main`.
 
 ## Licence
 Projet partage a titre experimental.  

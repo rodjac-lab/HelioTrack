@@ -48,6 +48,59 @@ export function createBuilding(THREE) {
   return group;
 }
 
+export function createSolarPanels(THREE) {
+  const group = new THREE.Group();
+
+  // Panel dimensions (approx 3x larger than before)
+  const panelWidth = 4.8;
+  const panelHeight = 3.0;
+  
+  // 1. Frame (Aluminium)
+  const frameGeometry = new THREE.BoxGeometry(panelWidth + 0.1, 0.05, panelHeight + 0.1);
+  const frameMaterial = new THREE.MeshStandardMaterial({
+    color: 0xc0c0c0, // Silver/Aluminium
+    roughness: 0.4,
+    metalness: 0.8
+  });
+  const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+  frame.castShadow = true;
+  frame.receiveShadow = true;
+  group.add(frame);
+
+  // 2. Solar Cells (Blueish)
+  const cellGeometry = new THREE.BoxGeometry(panelWidth, 0.02, panelHeight);
+  const cellMaterial = new THREE.MeshPhysicalMaterial({ 
+    color: 0x1e90ff, // DodgerBlue
+    emissive: 0x00008b, // DarkBlue emissive for vibrancy
+    emissiveIntensity: 0.2,
+    metalness: 0.5,
+    roughness: 0.1,
+    clearcoat: 1.0
+  });
+  const cell = new THREE.Mesh(cellGeometry, cellMaterial);
+  cell.position.y = 0.02; // Slightly above frame
+  group.add(cell);
+  
+  // Roof Geometry Math:
+  // Cone radius = 5, Height = 3, 4 segments, rotated 45 deg.
+  // Apothem a = 5 * cos(45) = 3.5355
+  const apothem = 5 * Math.cos(Math.PI / 4);
+  const roofHeight = 3;
+  const slopeAngle = Math.atan(roofHeight / apothem); // ~40.3 degrees
+  
+  // Position:
+  // Mid-height of roof is at global Y = 7.5
+  // The face center is at z = apothem / 2
+  const zPos = apothem / 2;
+  
+  // Position the entire group
+  // We position it at the center of the south face
+  group.position.set(0, 7.5, zPos + 0.1); 
+  group.rotation.x = slopeAngle; 
+  
+  return group;
+}
+
 export function createSun(THREE) {
   const sunGroup = new THREE.Group();
 
